@@ -54,7 +54,7 @@ async function main() {
     let name = req.params.name
     if (name) {
       u = {
-        cbnc: 'https://www.nbc.com/live?brand=cnbc&callsign=cnbc',
+        cnbc: 'https://www.nbc.com/live?brand=cnbc&callsign=cnbc',
         nbcnews: 'https://www.nbc.com/live?brand=nbc-news&callsign=nbcnews',
         weatherscan: 'https://weatherscan.net/',
       }[name]
