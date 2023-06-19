@@ -51,11 +51,19 @@ async function main() {
 
   app.get('/stream/:name?', async (req, res) => {
     var u = req.query.url
-    if (req.params.name) {
-      u = ({
-        'cbnc': 'https://www.nbc.com/live?brand=cnbc&callsign=cnbc',
-        'nbcnews': 'https://www.nbc.com/live?brand=nbc-news&callsign=nbcnews',
-      })[req.params.name]
+    let name = req.params.name
+    if (name) {
+      u = {
+        cbnc: 'https://www.nbc.com/live?brand=cnbc&callsign=cnbc',
+        nbcnews: 'https://www.nbc.com/live?brand=nbc-news&callsign=nbcnews',
+        weatherscan: 'https://weatherscan.net/',
+      }[name]
+    }
+
+    var waitForVideo = true
+    switch (name) {
+      case 'weatherscan':
+        waitForVideo = false
     }
 
     if (!currentBrowser || !currentBrowser.isConnected()) {
@@ -111,23 +119,25 @@ async function main() {
 
     try {
       await page.goto(u)
-      await page.waitForSelector('video')
-      await page.waitForFunction(() => {
-        let video = document.querySelector('video')
-        return video.readyState === 4
-      })
-      await page.evaluate(() => {
-        let video = document.querySelector('video')
-        video.style.position = 'fixed'
-        video.style.top = '0'
-        video.style.left = '0'
-        video.style.width = '100%'
-        video.style.height = '100%'
-        video.style.zIndex = '999000'
-        video.style.background = 'black'
-        video.style.cursor = 'none'
-        video.play()
-      })
+      if (waitForVideo) {
+        await page.waitForSelector('video')
+        await page.waitForFunction(() => {
+          let video = document.querySelector('video')
+          return video.readyState === 4
+        })
+        await page.evaluate(() => {
+          let video = document.querySelector('video')
+          video.style.position = 'fixed'
+          video.style.top = '0'
+          video.style.left = '0'
+          video.style.width = '100%'
+          video.style.height = '100%'
+          video.style.zIndex = '999000'
+          video.style.background = 'black'
+          video.style.cursor = 'none'
+          video.play()
+        })
+      }
 
       const session = await page.target().createCDPSession()
       const {windowId} = await session.send('Browser.getWindowForTarget')
