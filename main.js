@@ -72,7 +72,7 @@ async function main() {
 
     let browser = currentBrowser
     const page = await browser.newPage()
-    page.on('console', msg => console.log(msg.text()))
+    //page.on('console', msg => console.log(msg.text()))
 
     const stream = await getStream(page, {
       video: true,
@@ -90,47 +90,53 @@ async function main() {
         },
       },
     })
+
+    console.log('streaming', u)
     stream.pipe(res)
-
-    await page.goto(u)
-    await page.waitForSelector('video')
-    await page.waitForFunction(() => {
-      let video = document.querySelector('video')
-      return video.readyState === 4
-    })
-    await page.evaluate(() => {
-      let video = document.querySelector('video')
-      video.style.position = 'fixed'
-      video.style.top = '0'
-      video.style.left = '0'
-      video.style.width = '100%'
-      video.style.height = '100%'
-      video.style.zIndex = '999000'
-      video.style.background = 'black'
-      video.style.cursor = 'none'
-      video.play()
-    })
-
-    const session = await page.target().createCDPSession()
-    const {windowId} = await session.send('Browser.getWindowForTarget')
-    await session.send('Browser.setWindowBounds', {
-      windowId,
-      bounds: {
-        height: viewport.height + 77,
-        width: viewport.width,
-      },
-    })
-    await session.send('Browser.setWindowBounds', {
-      windowId,
-      bounds: {
-        windowState: 'minimized',
-      },
-    })
-
-    req.on('close', async err => {
+    res.on('close', async err => {
       await stream.destroy()
+      await page.close()
       console.log('finished', err)
     })
+
+    try {
+      await page.goto(u)
+      await page.waitForSelector('video')
+      await page.waitForFunction(() => {
+        let video = document.querySelector('video')
+        return video.readyState === 4
+      })
+      await page.evaluate(() => {
+        let video = document.querySelector('video')
+        video.style.position = 'fixed'
+        video.style.top = '0'
+        video.style.left = '0'
+        video.style.width = '100%'
+        video.style.height = '100%'
+        video.style.zIndex = '999000'
+        video.style.background = 'black'
+        video.style.cursor = 'none'
+        video.play()
+      })
+
+      const session = await page.target().createCDPSession()
+      const {windowId} = await session.send('Browser.getWindowForTarget')
+      await session.send('Browser.setWindowBounds', {
+        windowId,
+        bounds: {
+          height: viewport.height + 77,
+          width: viewport.width,
+        },
+      })
+      await session.send('Browser.setWindowBounds', {
+        windowId,
+        bounds: {
+          windowState: 'minimized',
+        },
+      })
+    } catch (e) {
+      console.log('failed to stream', u, e)
+    }
   })
 
   const server = app.listen(5589, () => {
