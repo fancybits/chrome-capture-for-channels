@@ -70,15 +70,11 @@ async function main() {
       currentBrowser = await launch({
         executablePath: getExecutablePath(),
         defaultViewport: null, // no viewport emulation
-        args: [
-          '--disable-notifications',
-          '--no-first-run',
-          '--disable-infobars',
-          '--hide-crash-restore-bubble',
-          `--user-data-dir=${path.join(process.cwd(), 'chromedata')}`,
-        ],
+        userDataDir: path.join(process.cwd(), 'chromedata'),
+        args: ['--disable-notifications', '--no-first-run', '--disable-infobars', '--hide-crash-restore-bubble'],
         ignoreDefaultArgs: [
           '--enable-automation',
+          '--disable-extensions',
           '--disable-component-update',
           '--enable-blink-features=IdleDetection',
         ],
