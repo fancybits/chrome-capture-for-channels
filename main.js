@@ -82,6 +82,9 @@ async function main() {
       currentBrowser.on('close', () => {
         currentBrowser = null
       })
+      currentBrowser.pages().then(pages => {
+        pages.forEach(page => page.close())
+      })
     }
 
     let browser = currentBrowser
