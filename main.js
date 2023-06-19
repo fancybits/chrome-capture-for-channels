@@ -92,30 +92,37 @@ async function main() {
     const page = await browser.newPage()
     //page.on('console', msg => console.log(msg.text()))
 
-    const stream = await getStream(page, {
-      video: true,
-      audio: true,
-      videoBitsPerSecond: 5000000,
-      audioBitsPerSecond: 128000,
-      mimeType: 'video/webm;codecs=H264',
-      videoConstraints: {
-        mandatory: {
-          minWidth: viewport.width,
-          minHeight: viewport.height,
-          maxWidth: viewport.width,
-          maxHeight: viewport.height,
-          minFrameRate: 60,
+    try {
+      const stream = await getStream(page, {
+        video: true,
+        audio: true,
+        videoBitsPerSecond: 5000000,
+        audioBitsPerSecond: 128000,
+        mimeType: 'video/webm;codecs=H264',
+        videoConstraints: {
+          mandatory: {
+            minWidth: viewport.width,
+            minHeight: viewport.height,
+            maxWidth: viewport.width,
+            maxHeight: viewport.height,
+            minFrameRate: 60,
+          },
         },
-      },
-    })
+      })
 
-    console.log('streaming', u)
-    stream.pipe(res)
-    res.on('close', async err => {
-      await stream.destroy()
+      console.log('streaming', u)
+      stream.pipe(res)
+      res.on('close', async err => {
+        await stream.destroy()
+        await page.close()
+        console.log('finished', u)
+      })
+    } catch (e) {
+      console.log('failed to start stream', u, e)
+      res.status(500).send(`failed to start stream: ${e}`)
       await page.close()
-      console.log('finished', u)
-    })
+      return
+    }
 
     try {
       await page.goto(u)
