@@ -49,8 +49,14 @@ async function main() {
     res.send('hello')
   })
 
-  app.get('/stream', async (req, res) => {
-    let u = req.query.url
+  app.get('/stream/:name?', async (req, res) => {
+    var u = req.query.url
+    if (req.params.name) {
+      u = ({
+        'cbnc': 'https://www.nbc.com/live?brand=cnbc&callsign=cnbc',
+        'nbcnews': 'https://www.nbc.com/live?brand=nbc-news&callsign=nbcnews',
+      })[req.params.name]
+    }
 
     if (!currentBrowser || !currentBrowser.isConnected()) {
       currentBrowser = await launch({
