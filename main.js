@@ -46,7 +46,22 @@ async function main() {
   const app = express()
 
   app.get('/', (req, res) => {
-    res.send('hello')
+    res.send(
+      `<html>
+  <title>Chrome Capture for Channels</title>
+  <h2>Chrome Capture for Channels</h2>
+  <p>Usage: <code>/stream?url=URL</code> or <code>/stream/&lt;name></code></p>
+  <pre>
+  #EXTM3U
+
+  #EXTINF:-1 channel-id="windy",Windy
+  chrome://${req.get('host')}/stream/windy
+
+  #EXTINF:-1 channel-id="weatherscan",Weatherscan
+  chrome://${req.get('host')}/stream/weatherscan
+  </pre>
+  </html>`
+    )
   })
 
   app.get('/stream/:name?', async (req, res) => {
