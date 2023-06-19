@@ -1,6 +1,6 @@
 const { launch, getStream } = require("puppeteer-stream");
 const fs = require("fs");
-const { exec } = require("child_process");
+const child_process = require("child_process");
 const process = require("process");
 const path = require("path");
 
@@ -72,7 +72,7 @@ async function main() {
 		},
 	});
 	// this will pipe the stream to ffmpeg and convert the webm to mkv format (which supports vp8/vp9)
-	const ffmpeg = exec(`ffmpeg -y -i - -c copy output.mkv`);
+	const ffmpeg = child_process.exec(`ffmpeg -y -i - -c copy output.mkv`);
 	ffmpeg.stderr.on("data", (chunk) => {
 		console.log(chunk.toString());
 	});
