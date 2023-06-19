@@ -10,6 +10,8 @@ const viewport = {
   height: 1080,
 }
 
+var currentBrowser
+
 const getExecutablePath = () => {
   if (process.env.CHROME_BIN) {
     return process.env.CHROME_BIN
@@ -41,87 +43,98 @@ const getExecutablePath = () => {
 }
 
 async function main() {
-  const browser = await launch({
-    executablePath: getExecutablePath(),
-    defaultViewport: null, // no viewport emulation
-    args: [
-      '--disable-notifications',
-      '--no-first-run',
-      '--disable-infobars',
-      '--hide-crash-restore-bubble',
-      `--user-data-dir=${path.join(process.cwd(), 'chromedata')}`,
-    ],
-    ignoreDefaultArgs: ['--enable-automation', '--disable-component-update'],
+  const app = express()
+
+  app.get('/', (req, res) => {
+    res.send('hello')
   })
 
-  const page = await browser.newPage()
-  const stream = await getStream(page, {
-    audio: true,
-    video: true,
-    frameSize: 1000,
-    audioBitsPerSecond: 128000,
-    videoBitsPerSecond: 5000000,
-    mimeType: 'video/webm;codecs=H264',
-    videoConstraints: {
-      mandatory: {
-        minWidth: viewport.width,
-        minHeight: viewport.height,
-        maxWidth: viewport.width,
-        maxHeight: viewport.height,
-        minFrameRate: 60,
+  app.get('/stream', async (req, res) => {
+    let u = req.query.url
+
+    if (!currentBrowser) {
+      currentBrowser = await launch({
+        executablePath: getExecutablePath(),
+        defaultViewport: null, // no viewport emulation
+        args: [
+          '--disable-notifications',
+          '--no-first-run',
+          '--disable-infobars',
+          '--hide-crash-restore-bubble',
+          `--user-data-dir=${path.join(process.cwd(), 'chromedata')}`,
+        ],
+        ignoreDefaultArgs: ['--enable-automation', '--disable-component-update'],
+      })
+      currentBrowser.on('close', () => {
+        currentBrowser = null
+      })
+    }
+
+    let browser = currentBrowser
+    const page = await browser.newPage()
+    page.on('console', msg => console.log(msg.text()))
+
+    await page.goto(u)
+    const stream = await getStream(page, {
+      video: true,
+      audio: true,
+      videoBitsPerSecond: 5000000,
+      audioBitsPerSecond: 128000,
+      mimeType: 'video/webm;codecs=H264',
+      videoConstraints: {
+        mandatory: {
+          minWidth: viewport.width,
+          minHeight: viewport.height,
+          maxWidth: viewport.width,
+          maxHeight: viewport.height,
+          minFrameRate: 60,
+        },
       },
-    },
-  })
-  // this will pipe the stream to ffmpeg and convert the webm to mkv format (which supports vp8/vp9)
-  const ffmpeg = child_process.exec(`ffmpeg -y -i - -c copy output.mkv`)
-  ffmpeg.stderr.on('data', chunk => {
-    console.log(chunk.toString())
-  })
-  stream.pipe(ffmpeg.stdin)
+    })
+    stream.pipe(res)
 
-  //await page.goto("https://www.nbc.com/live?brand=nbc-news&callsign=nbcnews");
-  await page.goto('https://www.nbc.com/live?brand=cnbc&callsign=cnbc')
-  await page.waitForSelector('video')
-  await page.waitForFunction(() => {
-    let video = document.querySelector('video')
-    return video.readyState === 4
-  })
-  await page.evaluate(() => {
-    let video = document.querySelector('video')
-    //video.requestFullscreen();
-    //document.querySelector("button[data-name=fullscreen]").click();
-    video.style.position = 'fixed'
-    video.style.top = '0'
-    video.style.left = '0'
-    video.style.width = '100%'
-    video.style.height = '100%'
-    video.style.zIndex = '999000'
-    video.style.background = 'black'
-    video.style.cursor = 'none'
-    video.play()
-  })
+    await page.waitForSelector('video')
+    await page.waitForFunction(() => {
+      let video = document.querySelector('video')
+      return video.readyState === 4
+    })
+    await page.evaluate(() => {
+      let video = document.querySelector('video')
+      video.style.position = 'fixed'
+      video.style.top = '0'
+      video.style.left = '0'
+      video.style.width = '100%'
+      video.style.height = '100%'
+      video.style.zIndex = '999000'
+      video.style.background = 'black'
+      video.style.cursor = 'none'
+      video.play()
+    })
 
-  const session = await page.target().createCDPSession()
-  const {windowId} = await session.send('Browser.getWindowForTarget')
-  await session.send('Browser.setWindowBounds', {
-    windowId,
-    bounds: {
-      height: viewport.height + 77,
-      width: viewport.width,
-    },
-  })
-  await session.send('Browser.setWindowBounds', {
-    windowId,
-    bounds: {
-      windowState: 'minimized',
-    },
+    const session = await page.target().createCDPSession()
+    const {windowId} = await session.send('Browser.getWindowForTarget')
+    await session.send('Browser.setWindowBounds', {
+      windowId,
+      bounds: {
+        height: viewport.height + 77,
+        width: viewport.width,
+      },
+    })
+    await session.send('Browser.setWindowBounds', {
+      windowId,
+      bounds: {
+        windowState: 'minimized',
+      },
+    })
+
+    req.on('close', async err => {
+      await stream.destroy()
+      console.log('finished', err)
+    })
   })
 
-  process.on('SIGINT', async () => {
-    await stream.destroy()
-    ffmpeg.kill('SIGINT')
-
-    console.log('finished')
+  const server = app.listen(5589, () => {
+    console.log('Chrome Capture server listening on port 5589')
   })
 }
 
