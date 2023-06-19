@@ -52,7 +52,7 @@ async function main() {
   app.get('/stream', async (req, res) => {
     let u = req.query.url
 
-    if (!currentBrowser) {
+    if (!currentBrowser || !currentBrowser.isConnected()) {
       currentBrowser = await launch({
         executablePath: getExecutablePath(),
         defaultViewport: null, // no viewport emulation
@@ -63,7 +63,11 @@ async function main() {
           '--hide-crash-restore-bubble',
           `--user-data-dir=${path.join(process.cwd(), 'chromedata')}`,
         ],
-        ignoreDefaultArgs: ['--enable-automation', '--disable-component-update'],
+        ignoreDefaultArgs: [
+          '--enable-automation',
+          '--disable-component-update',
+          '--enable-blink-features=IdleDetection',
+        ],
       })
       currentBrowser.on('close', () => {
         currentBrowser = null
@@ -96,7 +100,7 @@ async function main() {
     res.on('close', async err => {
       await stream.destroy()
       await page.close()
-      console.log('finished', err)
+      console.log('finished', u)
     })
 
     try {
