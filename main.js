@@ -65,6 +65,8 @@ async function main() {
       case 'weatherscan':
         waitForVideo = false
     }
+    var minimizeWindow = false
+    if (process.platform == 'darwin') minimizeWindow = true
 
     if (!currentBrowser || !currentBrowser.isConnected()) {
       currentBrowser = await launch({
@@ -154,12 +156,14 @@ async function main() {
           width: viewport.width,
         },
       })
-      await session.send('Browser.setWindowBounds', {
-        windowId,
-        bounds: {
-          windowState: 'minimized',
-        },
-      })
+      if (minimizeWindow) {
+        await session.send('Browser.setWindowBounds', {
+          windowId,
+          bounds: {
+            windowState: 'minimized',
+          },
+        })
+      }
     } catch (e) {
       console.log('failed to stream', u, e)
     }
