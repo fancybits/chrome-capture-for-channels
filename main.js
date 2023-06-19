@@ -105,11 +105,19 @@ async function main() {
         executablePath: getExecutablePath(),
         defaultViewport: null, // no viewport emulation
         userDataDir: path.join(process.cwd(), 'chromedata'),
-        args: ['--disable-notifications', '--no-first-run', '--disable-infobars', '--hide-crash-restore-bubble'],
+        args: [
+          '--disable-notifications',
+          '--no-first-run',
+          '--disable-infobars',
+          '--hide-crash-restore-bubble',
+          '--disable-blink-features=AutomationControlled',
+        ],
         ignoreDefaultArgs: [
           '--enable-automation',
           '--disable-extensions',
+          '--disable-default-apps',
           '--disable-component-update',
+          '--disable-component-extensions-with-background-pages',
           '--enable-blink-features=IdleDetection',
         ],
       })
@@ -123,6 +131,7 @@ async function main() {
 
     let browser = currentBrowser
     const page = await browser.newPage()
+    page.setBypassCSP(true)
     //page.on('console', msg => console.log(msg.text()))
 
     try {
