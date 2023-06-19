@@ -57,12 +57,14 @@ async function main() {
         cnbc: 'https://www.nbc.com/live?brand=cnbc&callsign=cnbc',
         nbcnews: 'https://www.nbc.com/live?brand=nbc-news&callsign=nbcnews',
         weatherscan: 'https://weatherscan.net/',
+        windy: 'https://windy.com',
       }[name]
     }
 
     var waitForVideo = true
     switch (name) {
       case 'weatherscan':
+      case 'windy':
         waitForVideo = false
     }
     var minimizeWindow = false
