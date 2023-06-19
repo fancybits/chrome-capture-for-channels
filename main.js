@@ -74,7 +74,6 @@ async function main() {
     const page = await browser.newPage()
     page.on('console', msg => console.log(msg.text()))
 
-    await page.goto(u)
     const stream = await getStream(page, {
       video: true,
       audio: true,
@@ -93,6 +92,7 @@ async function main() {
     })
     stream.pipe(res)
 
+    await page.goto(u)
     await page.waitForSelector('video')
     await page.waitForFunction(() => {
       let video = document.querySelector('video')
