@@ -249,16 +249,19 @@ async function main() {
         })()`)
       }
 
-      const uiHeight = await page.evaluate(`(function() {
-        return window.outerHeight - window.innerHeight
+      const uiSize = await page.evaluate(`(function() {
+        return {
+          height: window.outerHeight - window.innerHeight,
+          width: window.outerWidth - window.innerWidth,
+        }
       })()`)
       const session = await page.target().createCDPSession()
       const {windowId} = await session.send('Browser.getWindowForTarget')
       await session.send('Browser.setWindowBounds', {
         windowId,
         bounds: {
-          height: viewport.height + uiHeight,
-          width: viewport.width,
+          height: viewport.height + uiSize.height,
+          width: viewport.width + uiSize.width,
         },
       })
       if (minimizeWindow) {
