@@ -243,6 +243,8 @@ async function main() {
           video.style.zIndex = '999000'
           video.style.background = 'black'
           video.style.cursor = 'none'
+          video.style.transform = 'translate(0, 0)'
+          video.style.objectFit = 'contain'
           video.play()
         })()`)
       }
