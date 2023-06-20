@@ -3,7 +3,7 @@ set -e
 
 tag=$1
 test -n "$tag" || { echo "Usage: $0 <tag>"; exit 1; }
-npm run build
+script/build
 git tag $tag
 git push --tags
 gh release create $tag --generate-notes

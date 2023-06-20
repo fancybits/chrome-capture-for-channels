@@ -1,0 +1,28 @@
+#!/bin/sh
+set -e
+
+version=0.1.1
+npm run build
+
+for f in dist/chrome-capture-for-channels-macos-*; do
+  codesign --remove-signature $f
+done
+
+mkdir -p dist/ChromeCaptureARM64.app/Contents/Resources
+cp app.icns dist/ChromeCaptureARM64.app/Contents/Resources/app.icns
+mkdir -p dist/ChromeCaptureARM64.app/Contents/MacOS
+cp dist/chrome-capture-for-channels-macos-arm64 dist/ChromeCaptureARM64.app/Contents/MacOS/ChromeCapture
+cat Info.plist.template | sed -e 's,BUNDLEID,chrome-capture-for-channels-macos-arm64,g' | sed -e 's,BUNDLENAME,Chrome Capture,g' | sed -e "s,BUNDLEVERSION,$version,g" > dist/ChromeCaptureARM64.app/Contents/Info.plist
+codesign -s "Developer ID Application: Fancy Bits, LLC (LVM8JB4FT5)" dist/ChromeCaptureARM64.app
+zip dist/ChromeCaptureARM64.zip dist/ChromeCaptureARM64.app
+
+mkdir -p dist/ChromeCaptureIntel.app/Contents/Resources
+cp app.icns dist/ChromeCaptureIntel.app/Contents/Resources/app.icns
+mkdir -p dist/ChromeCaptureIntel.app/Contents/MacOS
+cp dist/chrome-capture-for-channels-macos-x64 dist/ChromeCaptureIntel.app/Contents/MacOS/ChromeCapture
+cat Info.plist.template | sed -e 's,BUNDLEID,chrome-capture-for-channels-macos-x64,g' | sed -e 's,BUNDLENAME,Chrome Capture,g' | sed -e "s,BUNDLEVERSION,$version,g" > dist/ChromeCaptureIntel.app/Contents/Info.plist
+codesign -s "Developer ID Application: Fancy Bits, LLC (LVM8JB4FT5)" dist/ChromeCaptureIntel.app
+zip dist/ChromeCaptureIntel.zip dist/ChromeCaptureIntel.app
+
+xcrun notarytool submit dist/ChromeCaptureARM64.zip --keychain-profile "fancybot_deployer"
+xcrun notarytool submit dist/ChromeCaptureIntel.zip --keychain-profile "fancybot_deployer"
