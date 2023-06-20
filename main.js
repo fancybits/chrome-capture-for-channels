@@ -5,6 +5,9 @@ const child_process = require('child_process')
 const process = require('process')
 const path = require('path')
 const express = require('express')
+require('console-stamp')(console, {
+  format: ':date(yyyy/mm/dd HH:MM:ss.l)',
+})
 
 const viewport = {
   width: 1920,

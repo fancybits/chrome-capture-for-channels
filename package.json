@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "bin": "main.js",
   "dependencies": {
+    "console-stamp": "^3.1.1",
     "express": "^4.18.2",
     "puppeteer-core": "^20.7.2",
     "puppeteer-stream": "^3.0.4"
@@ -14,8 +15,15 @@
     "pkg": "^5.8.1"
   },
   "pkg": {
-    "targets": [ "latest-macos-arm64", "latest-macos-x64", "latest-win-x64" ],
-    "assets": ["node_modules/vm2/**", "node_modules/puppeteer-stream/**"],
+    "targets": [
+      "latest-macos-arm64",
+      "latest-macos-x64",
+      "latest-win-x64"
+    ],
+    "assets": [
+      "node_modules/vm2/**",
+      "node_modules/puppeteer-stream/**"
+    ],
     "outputPath": "dist"
   },
   "scripts": {
