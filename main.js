@@ -118,6 +118,13 @@ async function main() {
         usap: 'https://www.nbc.com/live?brand=usa&callsign=usa_west',
         universo: 'https://www.nbc.com/live?brand=nbc-universo&callsign=universo_east',
         universop: 'https://www.nbc.com/live?brand=nbc-universo&callsign=universo_west',
+        necn: 'https://www.nbc.com/live?brand=necn&callsign=necn',
+        nbcsbayarea: 'https://www.nbc.com/live?brand=rsn-bay-area&callsign=nbcsbayarea',
+        nbcsboston: 'https://www.nbc.com/live?brand=rsn-boston&callsign=nbcsboston',
+        nbcscalifornia: 'https://www.nbc.com/live?brand=rsn-california&callsign=nbcscalifornia',
+        nbcschicago: 'https://www.nbc.com/live?brand=rsn-chicago&callsign=nbcschicago',
+        nbcsphiladelphia: 'https://www.nbc.com/live?brand=rsn-philadelphia&callsign=nbcsphiladelphia',
+        nbcswashington: 'https://www.nbc.com/live?brand=rsn-washington&callsign=nbcswashington',
         weatherscan: 'https://weatherscan.net/',
         windy: 'https://windy.com',
       }[name]
