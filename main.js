@@ -107,7 +107,7 @@ async function main() {
         usa: 'https://www.nbc.com/live?brand=usa&callsign=usa_east',
         usap: 'https://www.nbc.com/live?brand=usa&callsign=usa_west',
         universo: 'https://www.nbc.com/live?brand=nbc-universo&callsign=universo_east',
-        universo: 'https://www.nbc.com/live?brand=nbc-universo&callsign=universo_west',
+        universop: 'https://www.nbc.com/live?brand=nbc-universo&callsign=universo_west',
         weatherscan: 'https://weatherscan.net/',
         windy: 'https://windy.com',
       }[name]
