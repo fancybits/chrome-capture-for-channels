@@ -135,6 +135,9 @@ async function main() {
                 `--disable-extensions-except=${path.join(dataDir, 'extension')}`,
               ])
             }
+            if (process.env.DOCKER || process.platform == 'win32') {
+              opts.args = opts.args.concat(['--no-sandbox'])
+            }
             return puppeteerLaunch(opts)
           },
         },
