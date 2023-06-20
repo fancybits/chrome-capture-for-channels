@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+
+tag=$1
+test -n "$tag" || { echo "Usage: $0 <tag>"; exit 1; }
+make dist/chrome-capture-for-channels-macos
+g tag $tag
+gh release upload $tag dist/chrome-capture-for-channels-macos dist/chrome-capture-for-channels-win-x64.exe
