@@ -5,6 +5,7 @@
   "dependencies": {
     "console-stamp": "^3.1.1",
     "express": "^4.18.2",
+    "morgan": "^1.10.0",
     "puppeteer-core": "^20.7.2",
     "puppeteer-stream": "^3.0.4"
   },

@@ -5,6 +5,7 @@ const child_process = require('child_process')
 const process = require('process')
 const path = require('path')
 const express = require('express')
+const morgan = require('morgan')
 require('console-stamp')(console, {
   format: ':date(yyyy/mm/dd HH:MM:ss.l)',
 })
@@ -69,6 +70,12 @@ async function main() {
   }
 
   const app = express()
+
+  const df = require('dateformat')
+  morgan.token('mydate', function (req) {
+    return df(new Date(), 'yyyy/mm/dd HH:MM:ss.l')
+  })
+  app.use(morgan('[:mydate] :method :url from :remote-addr responded :status in :response-time ms'))
 
   app.get('/', (req, res) => {
     res.send(
