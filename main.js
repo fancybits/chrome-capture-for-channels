@@ -1,3 +1,4 @@
+const {launch: puppeteerLaunch} = require('puppeteer-core')
 const {launch, getStream} = require('puppeteer-stream')
 const fs = require('fs')
 const child_process = require('child_process')
@@ -43,6 +44,27 @@ const getExecutablePath = () => {
 }
 
 async function main() {
+  var dataDir = process.cwd()
+
+  if (process.pkg) {
+    switch (process.platform) {
+      case 'darwin':
+        dataDir = path.join(process.env.HOME, 'Library', 'Application Support', 'ChromeCapture')
+        break
+      case 'win32':
+        dataDir = path.join(process.env.USERPROFILE, 'AppData', 'Local', 'ChromeCapture')
+        break
+    }
+    let out = path.join(dataDir, 'extension')
+    fs.mkdirSync(out, {recursive: true})
+    ;['manifest.json', 'background.js', 'options.html', 'options.js'].forEach(file => {
+      fs.copyFileSync(
+        path.join(process.pkg.entrypoint, '..', 'node_modules', 'puppeteer-stream', 'extension', file),
+        path.join(out, file)
+      )
+    })
+  }
+
   const app = express()
 
   app.get('/', (req, res) => {
@@ -101,26 +123,42 @@ async function main() {
     if (process.platform == 'darwin') minimizeWindow = true
 
     if (!currentBrowser || !currentBrowser.isConnected()) {
-      currentBrowser = await launch({
-        executablePath: getExecutablePath(),
-        defaultViewport: null, // no viewport emulation
-        userDataDir: path.join(process.cwd(), 'chromedata'),
-        args: [
-          '--disable-notifications',
-          '--no-first-run',
-          '--disable-infobars',
-          '--hide-crash-restore-bubble',
-          '--disable-blink-features=AutomationControlled',
-        ],
-        ignoreDefaultArgs: [
-          '--enable-automation',
-          '--disable-extensions',
-          '--disable-default-apps',
-          '--disable-component-update',
-          '--disable-component-extensions-with-background-pages',
-          '--enable-blink-features=IdleDetection',
-        ],
-      })
+      currentBrowser = await launch(
+        {
+          launch: opts => {
+            if (process.pkg) {
+              opts.args = opts.args.filter(
+                arg => !arg.startsWith('--load-extension=') && !arg.startsWith('--disable-extensions-except=')
+              )
+              opts.args = opts.args.concat([
+                `--load-extension=${path.join(dataDir, 'extension')}`,
+                `--disable-extensions-except=${path.join(dataDir, 'extension')}`,
+              ])
+            }
+            return puppeteerLaunch(opts)
+          },
+        },
+        {
+          executablePath: getExecutablePath(),
+          defaultViewport: null, // no viewport emulation
+          userDataDir: path.join(dataDir, 'chromedata'),
+          args: [
+            '--disable-notifications',
+            '--no-first-run',
+            '--disable-infobars',
+            '--hide-crash-restore-bubble',
+            '--disable-blink-features=AutomationControlled',
+          ],
+          ignoreDefaultArgs: [
+            '--enable-automation',
+            '--disable-extensions',
+            '--disable-default-apps',
+            '--disable-component-update',
+            '--disable-component-extensions-with-background-pages',
+            '--enable-blink-features=IdleDetection',
+          ],
+        }
+      )
       currentBrowser.on('close', () => {
         currentBrowser = null
       })
@@ -170,11 +208,11 @@ async function main() {
       await page.goto(u)
       if (waitForVideo) {
         await page.waitForSelector('video')
-        await page.waitForFunction(() => {
+        await page.waitForFunction(`(function() {
           let video = document.querySelector('video')
           return video.readyState === 4
-        })
-        await page.evaluate(() => {
+        })()`)
+        await page.evaluate(`(function() {
           let video = document.querySelector('video')
           video.style.position = 'fixed'
           video.style.top = '0'
@@ -185,12 +223,12 @@ async function main() {
           video.style.background = 'black'
           video.style.cursor = 'none'
           video.play()
-        })
+        })()`)
       }
 
-      const uiHeight = await page.evaluate(() => {
+      const uiHeight = await page.evaluate(`(function() {
         return window.outerHeight - window.innerHeight
-      })
+      })()`)
       const session = await page.target().createCDPSession()
       const {windowId} = await session.send('Browser.getWindowForTarget')
       await session.send('Browser.setWindowBounds', {
