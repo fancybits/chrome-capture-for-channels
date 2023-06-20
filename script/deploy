@@ -5,5 +5,6 @@ tag=$1
 test -n "$tag" || { echo "Usage: $0 <tag>"; exit 1; }
 npm run build
 git tag $tag
+git push --tags
 gh release create $tag --generate-notes
 gh release upload $tag dist/chrome-capture-for-channels-macos-* dist/chrome-capture-for-channels-win-x64.exe
