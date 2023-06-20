@@ -151,6 +151,7 @@ async function main() {
             '--disable-infobars',
             '--hide-crash-restore-bubble',
             '--disable-blink-features=AutomationControlled',
+            '--hide-scrollbars',
           ],
           ignoreDefaultArgs: [
             '--enable-automation',
