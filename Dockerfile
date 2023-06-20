@@ -20,4 +20,5 @@ FROM base
 RUN npm install
 EXPOSE 5589
 ENV DISPLAY :99
+ENV CHROME_BIN /usr/bin/google-chrome
 CMD Xvfb :99 -screen 0 1920x1080x16 & node main.js
