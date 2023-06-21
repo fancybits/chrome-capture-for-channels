@@ -15,7 +15,58 @@ const viewport = {
   height: 1080,
 }
 
-var currentBrowser
+var currentBrowser, dataDir, lastPage
+const getCurrentBrowser = async () => {
+  if (!currentBrowser || !currentBrowser.isConnected()) {
+    currentBrowser = await launch(
+      {
+        launch: opts => {
+          if (process.pkg) {
+            opts.args = opts.args.filter(
+              arg => !arg.startsWith('--load-extension=') && !arg.startsWith('--disable-extensions-except=')
+            )
+            opts.args = opts.args.concat([
+              `--load-extension=${path.join(dataDir, 'extension')}`,
+              `--disable-extensions-except=${path.join(dataDir, 'extension')}`,
+            ])
+          }
+          if (process.env.DOCKER || process.platform == 'win32') {
+            opts.args = opts.args.concat(['--no-sandbox'])
+          }
+          return puppeteerLaunch(opts)
+        },
+      },
+      {
+        executablePath: getExecutablePath(),
+        defaultViewport: null, // no viewport emulation
+        userDataDir: path.join(dataDir, 'chromedata'),
+        args: [
+          '--disable-notifications',
+          '--no-first-run',
+          '--disable-infobars',
+          '--hide-crash-restore-bubble',
+          '--disable-blink-features=AutomationControlled',
+          '--hide-scrollbars',
+        ],
+        ignoreDefaultArgs: [
+          '--enable-automation',
+          '--disable-extensions',
+          '--disable-default-apps',
+          '--disable-component-update',
+          '--disable-component-extensions-with-background-pages',
+          '--enable-blink-features=IdleDetection',
+        ],
+      }
+    )
+    currentBrowser.on('close', () => {
+      currentBrowser = null
+    })
+    currentBrowser.pages().then(pages => {
+      pages.forEach(page => page.close())
+    })
+  }
+  return currentBrowser
+}
 
 const getExecutablePath = () => {
   if (process.env.CHROME_BIN) {
@@ -48,8 +99,7 @@ const getExecutablePath = () => {
 }
 
 async function main() {
-  var dataDir = process.cwd()
-
+  dataDir = process.cwd()
   if (process.pkg) {
     switch (process.platform) {
       case 'darwin':
@@ -96,6 +146,50 @@ async function main() {
     )
   })
 
+  app.get('/debug', async (req, res) => {
+    res.send(`<html>
+    <script>
+    async function videoClick(e) {
+      e.target.focus()
+      let x = ((e.clientX-e.target.offsetLeft) * e.target.videoWidth)/e.target.clientWidth
+      let y = ((e.clientY-e.target.offsetTop) * e.target.videoHeight)/e.target.clientHeight
+      console.log('video click', x, y)
+      await fetch('/debug/click/'+x+'/'+y)
+    }
+    function videoKeyPress(e) {
+      console.log('video keypress', e.key)
+    }
+    </script>
+    <video style="width: 100%; height: 100%" onKeyPress="videoKeyPress(event)" onClick="videoClick(event)" src="/stream?waitForVideo=false&url=${encodeURIComponent(
+      req.query.url || 'https://google.com'
+    )}" autoplay muted />
+    </html>`)
+  })
+
+  app.get('/debug/click/:x/:y', async (req, res) => {
+    let browser = await getCurrentBrowser()
+    let pages = await browser.pages()
+    if (pages.length == 0) {
+      res.send('false')
+      return
+    }
+    let page = pages[pages.length - 1]
+    await page.mouse.click(parseInt(req.params.x), parseInt(req.params.y))
+    res.send('true')
+  })
+
+  app.get('/debug/keypress/:key', async (req, res) => {
+    let browser = await getCurrentBrowser()
+    let pages = await browser.pages()
+    if (pages.length == 0) {
+      res.send('false')
+      return
+    }
+    let page = pages[pages.length - 1]
+    await page.keyboard.press(req.params.key)
+    res.send('true')
+  })
+
   app.get('/stream/:name?', async (req, res) => {
     var u = req.query.url
     let name = req.params.name
@@ -130,7 +224,7 @@ async function main() {
       }[name]
     }
 
-    var waitForVideo = true
+    var waitForVideo = req.query.waitForVideo === 'false' ? false : true
     switch (name) {
       case 'weatherscan':
       case 'windy':
@@ -139,56 +233,7 @@ async function main() {
     var minimizeWindow = false
     if (process.platform == 'darwin') minimizeWindow = true
 
-    if (!currentBrowser || !currentBrowser.isConnected()) {
-      currentBrowser = await launch(
-        {
-          launch: opts => {
-            if (process.pkg) {
-              opts.args = opts.args.filter(
-                arg => !arg.startsWith('--load-extension=') && !arg.startsWith('--disable-extensions-except=')
-              )
-              opts.args = opts.args.concat([
-                `--load-extension=${path.join(dataDir, 'extension')}`,
-                `--disable-extensions-except=${path.join(dataDir, 'extension')}`,
-              ])
-            }
-            if (process.env.DOCKER || process.platform == 'win32') {
-              opts.args = opts.args.concat(['--no-sandbox'])
-            }
-            return puppeteerLaunch(opts)
-          },
-        },
-        {
-          executablePath: getExecutablePath(),
-          defaultViewport: null, // no viewport emulation
-          userDataDir: path.join(dataDir, 'chromedata'),
-          args: [
-            '--disable-notifications',
-            '--no-first-run',
-            '--disable-infobars',
-            '--hide-crash-restore-bubble',
-            '--disable-blink-features=AutomationControlled',
-            '--hide-scrollbars',
-          ],
-          ignoreDefaultArgs: [
-            '--enable-automation',
-            '--disable-extensions',
-            '--disable-default-apps',
-            '--disable-component-update',
-            '--disable-component-extensions-with-background-pages',
-            '--enable-blink-features=IdleDetection',
-          ],
-        }
-      )
-      currentBrowser.on('close', () => {
-        currentBrowser = null
-      })
-      currentBrowser.pages().then(pages => {
-        pages.forEach(page => page.close())
-      })
-    }
-
-    let browser = currentBrowser
+    let browser = await getCurrentBrowser()
     const page = await browser.newPage()
     //await page.setBypassCSP(true)
     //page.on('console', msg => console.log(msg.text()))
