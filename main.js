@@ -297,7 +297,7 @@ async function main() {
         })()`)
         await page.evaluate(`(function() {
           let video = document.querySelector('video')
-          video.style.position = 'fixed'
+          video.style.setProperty('position', 'fixed', 'important')
           video.style.top = '0'
           video.style.left = '0'
           video.style.width = '100%'
