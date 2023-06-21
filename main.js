@@ -246,6 +246,11 @@ async function main() {
           video.style.transform = 'translate(0, 0)'
           video.style.objectFit = 'contain'
           video.play()
+
+          let header = document.querySelector('.header-container')
+          if (header) {
+            header.style.zIndex = '0'
+          }
         })()`)
       }
 
