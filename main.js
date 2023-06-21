@@ -253,8 +253,8 @@ async function main() {
       const stream = await getStream(page, {
         video: true,
         audio: true,
-        videoBitsPerSecond: 5000000,
-        audioBitsPerSecond: 128000,
+        videoBitsPerSecond: 8000000,
+        audioBitsPerSecond: 192000,
         mimeType: 'video/webm;codecs=H264',
         videoConstraints: {
           mandatory: {
