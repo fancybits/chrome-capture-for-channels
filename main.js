@@ -88,9 +88,18 @@ const getExecutablePath = () => {
       }
     }
   } else if (process.platform === 'darwin') {
-    executablePath = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+    executablePath = [
+      '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+      '/Applications/Chromium.app/Contents/MacOS/Chromium',
+      '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser',
+    ].find(fs.existsSync)
   } else if (process.platform === 'win32') {
-    executablePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+    executablePath = [
+      `C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe`,
+      `C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe`,
+      path.join(process.env.USERPROFILE, 'AppData', 'Local', 'Google', 'Chrome', 'Application', 'chrome.exe'),
+      path.join(process.env.USERPROFILE, 'AppData', 'Local', 'Chromium', 'Application', 'chrome.exe'),
+    ].find(fs.existsSync)
   } else {
     throw new Error('Unsupported platform: ' + process.platform)
   }
