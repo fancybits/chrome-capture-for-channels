@@ -190,7 +190,7 @@ async function main() {
 
     let browser = currentBrowser
     const page = await browser.newPage()
-    await page.setBypassCSP(true)
+    //await page.setBypassCSP(true)
     //page.on('console', msg => console.log(msg.text()))
 
     try {
