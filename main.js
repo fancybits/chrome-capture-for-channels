@@ -156,9 +156,11 @@ async function main() {
       console.log('video click', x, y)
       await fetch('/debug/click/'+x+'/'+y)
     }
-    function videoKeyPress(e) {
+    async function videoKeyPress(e) {
       console.log('video keypress', e.key)
+      await fetch('/debug/keypress/'+e.key)
     }
+    document.addEventListener('keypress', videoKeyPress)
     </script>
     <video style="width: 100%; height: 100%" onKeyPress="videoKeyPress(event)" onClick="videoClick(event)" src="/stream?waitForVideo=false&url=${encodeURIComponent(
       req.query.url || 'https://google.com'
@@ -231,7 +233,7 @@ async function main() {
         waitForVideo = false
     }
     var minimizeWindow = false
-    if (process.platform == 'darwin') minimizeWindow = true
+    if (process.platform == 'darwin' && waitForVideo) minimizeWindow = true
 
     let browser = await getCurrentBrowser()
     const page = await browser.newPage()
