@@ -244,9 +244,10 @@ async function main() {
     var minimizeWindow = false
     if (process.platform == 'darwin' && waitForVideo) minimizeWindow = true
 
+    var browser, page
     try {
-      let browser = await getCurrentBrowser()
-      const page = await browser.newPage()
+      browser = await getCurrentBrowser()
+      page = await browser.newPage()
       //await page.setBypassCSP(true)
       //page.on('console', msg => console.log(msg.text()))
     } catch (e) {
