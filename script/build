@@ -4,15 +4,11 @@ set -e
 rm dist/chrome-capture-for-channels-*
 npm run build
 
-for f in dist/chrome-capture-for-channels-macos-*; do
-  codesign --remove-signature $f
-done
-
-codesign -s "Developer ID Application: Fancy Bits, LLC (LVM8JB4FT5)" dist/chrome-capture-for-channels-macos-arm64
+codesign --entitlements entitlements.xml -o runtime -s "Developer ID Application: Fancy Bits, LLC (LVM8JB4FT5)" dist/chrome-capture-for-channels-macos-arm64
 rm -f dist/ChromeCaptureARM64.zip
 (cd dist && zip -r ChromeCaptureARM64.zip chrome-capture-for-channels-macos-arm64)
 
-codesign -s "Developer ID Application: Fancy Bits, LLC (LVM8JB4FT5)" dist/chrome-capture-for-channels-macos-x64
+codesign --entitlements entitlements.xml -o runtime -s "Developer ID Application: Fancy Bits, LLC (LVM8JB4FT5)" dist/chrome-capture-for-channels-macos-x64
 rm -f dist/ChromeCaptureIntel.zip
 (cd dist && zip -r ChromeCaptureIntel.zip chrome-capture-for-channels-macos-x64)
 
