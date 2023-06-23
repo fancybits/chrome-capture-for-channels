@@ -6,6 +6,7 @@ const process = require('process')
 const path = require('path')
 const express = require('express')
 const morgan = require('morgan')
+require('express-async-errors')
 require('console-stamp')(console, {
   format: ':date(yyyy/mm/dd HH:MM:ss.l)',
 })
