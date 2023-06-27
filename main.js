@@ -310,6 +310,8 @@ async function main() {
           video.style.transform = 'translate(0, 0)'
           video.style.objectFit = 'contain'
           video.play()
+          video.muted = false
+          video.removeAttribute('muted')
 
           let header = document.querySelector('.header-container')
           if (header) {
