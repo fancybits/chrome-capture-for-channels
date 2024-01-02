@@ -42,7 +42,6 @@ const getCurrentBrowser = async () => {
         defaultViewport: null, // no viewport emulation
         userDataDir: path.join(dataDir, 'chromedata'),
         args: [
-          '--disable-notifications',
           '--no-first-run',
           '--disable-infobars',
           '--hide-crash-restore-bubble',
