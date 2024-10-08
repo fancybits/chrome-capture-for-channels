@@ -28,4 +28,5 @@ EXPOSE 5589
 ENV DISPLAY :99
 ENV CHROME_BIN /usr/bin/google-chrome
 ENV DOCKER true
-CMD ["Xvfb", ":99", "-screen", "0", "1920x1080x16", "&", "node", "main.js"]
+ENTRYPOINT Xvfb :99 -screen 0 1920x1080x16 & x11vnc -display :99 -forever
+CMD ["node","main.js"]
