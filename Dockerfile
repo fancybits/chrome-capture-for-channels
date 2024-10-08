@@ -24,8 +24,8 @@ USER chrome
 
 FROM base
 RUN npm install
-#EXPOSE 5589
+EXPOSE 5589
 ENV DISPLAY :99
 ENV CHROME_BIN /usr/bin/google-chrome
 ENV DOCKER true
-CMD Xvfb :99 -screen 0 1920x1080x16 & node main.js
+CMD ["Xvfb", ":99", "-screen", "0", "1920x1080x16", "&", "node", "main.js"]
