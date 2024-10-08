@@ -11,14 +11,16 @@ RUN apt-get update \
     && apt-get install -y google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 --no-install-recommends
 
 WORKDIR /home/chrome
-RUN groupadd -r chrome && useradd -r -g chrome -G audio,video chrome
-COPY main.js package.json yarn.lock /home/chrome
-RUN chown -R chrome:chrome /home/chrome
+RUN groupadd -r chrome && useradd -r -g chrome -G audio,video chrome >&2
+COPY main.js package.json yarn.lock /home/chrome >&2
+RUN chown -R chrome:chrome /home/chrome RUN >&2
+RUN ls -al /home/chrome >&2
 USER chrome
+
 
 FROM base
 RUN npm install
-EXPOSE 5589
+#EXPOSE 5589
 ENV DISPLAY :99
 ENV CHROME_BIN /usr/bin/google-chrome
 ENV DOCKER true
