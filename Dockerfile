@@ -15,7 +15,6 @@ RUN apt-get update \
 WORKDIR /home/chrome
 COPY main.js package.json yarn.lock /home/chrome/
 
-
 FROM base
 RUN npm install
 EXPOSE 5589
