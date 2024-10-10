@@ -38,8 +38,10 @@ const getCurrentBrowser = async () => {
             opts.args = opts.args.concat([
               '--use-gl=angle',
               '--use-angle=gl-egl',
-              '--enable-features=VaapiVideoDecode',
+              '--enable-features=VaapiVideoDecoder,VaapiVideoEncoder',
               '--ignore-gpu-blocklist',
+              '--enable-zero-copy',
+              '--enable-drdc'
             ])
           }
           return puppeteerLaunch(opts)
