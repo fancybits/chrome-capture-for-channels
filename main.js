@@ -34,6 +34,16 @@ const getCurrentBrowser = async () => {
           if (process.env.DOCKER || process.platform == 'win32') {
             opts.args = opts.args.concat(['--no-sandbox'])
           }
+          if (process.env.DOCKER) {
+            opts.args = opts.args.concat([
+              '--use-gl=angle',
+              '--use-angle=gl-egl',
+              '--enable-features=VaapiVideoDecoder,VaapiVideoEncoder',
+              '--ignore-gpu-blocklist',
+              '--enable-zero-copy',
+              '--enable-drdc'
+            ])
+          }
           return puppeteerLaunch(opts)
         },
       },
@@ -232,6 +242,7 @@ async function main() {
         nbcswashington: 'https://www.nbc.com/live?brand=rsn-washington&callsign=nbcswashington',
         weatherscan: 'https://weatherscan.net/',
         windy: 'https://windy.com',
+        gpu: 'chrome://gpu',
       }[name]
     }
 
@@ -239,6 +250,7 @@ async function main() {
     switch (name) {
       case 'weatherscan':
       case 'windy':
+      case 'gpu':
         waitForVideo = false
     }
     var minimizeWindow = false
