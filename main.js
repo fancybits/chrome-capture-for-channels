@@ -16,6 +16,10 @@ const viewport = {
   height: 1080,
 }
 
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 var currentBrowser, dataDir, lastPage
 const getCurrentBrowser = async () => {
   if (!currentBrowser || !currentBrowser.isConnected()) {
@@ -287,17 +291,17 @@ async function main() {
     var minimizeWindow = false
     if (process.platform == 'darwin' && waitForVideo) minimizeWindow = true
 
-    function delay(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
+    async function setupPage(browser) {
+      
+      // Create a new page
+      var newPage = await browser.newPage();
 
-    async function setupPage(page) {
-      await page.setBypassCSP(true); // Sometimes needed for puppeteer-stream
-      // Wait for the page to be stable
-      await delay(1000);
+      // Stabilize it
+      await newPage.setBypassCSP(true); // Sometimes needed for puppeteer-stream
+      await delay(1000); // Wait for the page to be stable
 
       // Now try to enable stream capabilities
-      if (page.getStream) {
+      if (newPage.getStream) {
         console.log('Stream capabilities already present');
       } else {
         console.log('Need to initialize stream capabilities');
@@ -305,20 +309,21 @@ async function main() {
       }
       
       // Show browser error messages, but for Sling filter out Sling Mixed Content warnings
-      page.on('console', msg => {
+      newPage.on('console', msg => {
         const text = msg.text();
         // Filter out messages containing "Mixed Content"
         if (!text.includes("Mixed Content")) {
           console.log(text);
         }
       });
+
+      return newPage;
     }
 
     var browser, page
     try {
       browser = await getCurrentBrowser()
-      page = await browser.newPage()
-      setupPage(page);
+      page = await setupPage(browser);
       
     } catch (e) {
       console.log('failed to start browser page', u, e)
