@@ -89,7 +89,7 @@ const getCurrentBrowser = async () => {
     )
 
     currentBrowser.on('close', () => {
-      currentBrowser = null
+      currentBrowser = null;
       console.log('Browser closed');
     })
 
@@ -424,26 +424,22 @@ async function main() {
       if (u.includes("watch.sling.com")) {
         console.log("URL contains watch.sling.com");
         try {
-          
-          // Unmute screen
-  
-          // Simulate pressing the Tab key 9 times
+
+          // Unmute screen after 9 tabs
           for (let i = 0; i < 9; i++) {
             await delay(100);
             await page.keyboard.press('Tab');
           }   
-          console.log("Pressed Tab 9 times");
-    
-          // Press Enter to unmute
           await page.keyboard.press('Enter');
-          console.log("Pressed Enter");
-
+          
           // Increase volume to max
           // Simulate pressing the arrow key 8 times
           for (let i = 0; i < 8; i++) {
             await delay(100);
             await page.keyboard.press('ArrowRight');
           }   
+
+          console.log("Selected Fullscreen and Unmuted");
           
         } catch (e) {
           // Handle any errors specific to watch.spectrum.com...
