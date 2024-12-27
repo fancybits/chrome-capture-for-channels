@@ -25,6 +25,10 @@ setup a new Custom Channel using:
 #EXTM3U
 #EXTINF:-1 channel-id="weatherscan",Weatherscan
 chrome://x.x.x.x:5589/stream?url=https://weatherscan.net
+
+#EXTINF:-1 channel-id="CC" tvg-chno="107" tvc-guide-stationid="62420", Comedy Central
+chrome://x.x.x.x:5589/stream?url=https://watch.sling.com/1/channel/29938328f60d447299ec48511a09ebab/watch
+
 ```
 
 ### development

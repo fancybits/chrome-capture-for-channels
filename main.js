@@ -32,7 +32,7 @@ const getCurrentBrowser = async () => {
             ])
           }
           if (process.env.DOCKER || process.platform == 'win32') {
-            opts.args = opts.args.concat(['--no-sandbox'])
+            //opts.args = opts.args.concat(['--no-sandbox'])
           }
           if (process.env.DOCKER) {
             opts.args = opts.args.concat([
@@ -44,19 +44,34 @@ const getCurrentBrowser = async () => {
               '--enable-drdc'
             ])
           }
+          console.log("Launching Browser, Opts", opts);
           return puppeteerLaunch(opts)
         },
       },
       {
         executablePath: getExecutablePath(),
+        pipe: true, // more robust to keep browser connection from disconnecting
         defaultViewport: null, // no viewport emulation
         userDataDir: path.join(dataDir, 'chromedata'),
         args: [
-          '--no-first-run',
+          '--no-first-run', // Skip first run wizards
           '--disable-infobars',
           '--hide-crash-restore-bubble',
-          '--disable-blink-features=AutomationControlled',
-          '--hide-scrollbars',
+          '--allow-running-insecure-content',  // Sling has both https and http
+          '--autoplay-policy=no-user-gesture-required',
+          '--log-level=2', // error level only
+          '--disable-blink-features=AutomationControlled', // mitigates bot detection
+          '--hide-scrollbars', // Hide scrollbars on captured pages
+          '--hide-crash-restore-bubble', // Hide the yellow notification bar
+          '--window-size=1920,1080', // Set viewport resolution
+          '--disable-notifications', // Mimic real user behavior
+          '--enable-accelerated-video-decode',
+          '--enable-accelerated-video-encode', 
+          '--enable-features=UseSurfaceLayerForVideoCapture',
+          '--enable-gpu-rasterization', 
+          '--enable-oop-rasterization',
+          '--disable-software-rasterizer', 
+          '--enable-audio-output', // Ensure audio output is enabled
         ],
         ignoreDefaultArgs: [
           '--enable-automation',
@@ -68,13 +83,30 @@ const getCurrentBrowser = async () => {
         ],
       }
     )
+
     currentBrowser.on('close', () => {
       currentBrowser = null
+      console.log('Browser closed');
     })
-    currentBrowser.pages().then(pages => {
-      pages.forEach(page => page.close())
-    })
+
+    currentBrowser.on('targetcreated', (target) => {
+      console.log('New target page created:', target.url());
+    });
+    
+    currentBrowser.on('targetchanged', (target) => {
+      console.log('Target page changed:', target.url());
+    });
+    
+    currentBrowser.on('targetdestroyed', (target) => {
+      console.log('Browser page closed:', target.url());
+    });
+  
+    currentBrowser.on('disconnected', () => {
+      console.log('Browser disconnected');
+    });
+
   }
+
   return currentBrowser
 }
 
@@ -250,18 +282,44 @@ async function main() {
     switch (name) {
       case 'weatherscan':
       case 'windy':
-      case 'gpu':
         waitForVideo = false
     }
     var minimizeWindow = false
     if (process.platform == 'darwin' && waitForVideo) minimizeWindow = true
 
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function setupPage(page) {
+      await page.setBypassCSP(true); // Sometimes needed for puppeteer-stream
+      // Wait for the page to be stable
+      await delay(1000);
+
+      // Now try to enable stream capabilities
+      if (page.getStream) {
+        console.log('Stream capabilities already present');
+      } else {
+        console.log('Need to initialize stream capabilities');
+        // Here you might need to reinitialize puppeteer-stream
+      }
+      
+      // Show browser error messages, but for Sling filter out Sling Mixed Content warnings
+      page.on('console', msg => {
+        const text = msg.text();
+        // Filter out messages containing "Mixed Content"
+        if (!text.includes("Mixed Content")) {
+          console.log(text);
+        }
+      });
+    }
+
     var browser, page
     try {
       browser = await getCurrentBrowser()
       page = await browser.newPage()
-      //await page.setBypassCSP(true)
-      //page.on('console', msg => console.log(msg.text()))
+      setupPage(page);
+      
     } catch (e) {
       console.log('failed to start browser page', u, e)
       res.status(500).send(`failed to start browser page: ${e}`)
@@ -270,10 +328,12 @@ async function main() {
 
     try {
       const stream = await getStream(page, {
+        videoCodec: 'h264_nvenc', // Use NVENC for video encoding
+        //audioCodec: 'aac', // Use AAC for audio encoding
         video: true,
         audio: true,
-        videoBitsPerSecond: 8000000,
-        audioBitsPerSecond: 192000,
+        videoBitsPerSecond: 6000000,
+        audioBitsPerSecond: 320000,
         mimeType: 'video/webm;codecs=H264',
         videoConstraints: {
           mandatory: {
@@ -281,7 +341,7 @@ async function main() {
             minHeight: viewport.height,
             maxWidth: viewport.width,
             maxHeight: viewport.height,
-            minFrameRate: 60,
+            minFrameRate: 30,
           },
         },
       })
@@ -354,6 +414,38 @@ async function main() {
           },
         })
       }
+
+      // Handle Sling TV
+      if (u.includes("watch.sling.com")) {
+        console.log("URL contains watch.sling.com");
+        try {
+          
+          // Unmute screen
+  
+          // Simulate pressing the Tab key 9 times
+          for (let i = 0; i < 9; i++) {
+            await delay(100);
+            await page.keyboard.press('Tab');
+          }   
+          console.log("Pressed Tab 9 times");
+    
+          // Press Enter to unmute
+          await page.keyboard.press('Enter');
+          console.log("Pressed Enter");
+
+          // Increase volume to max
+          // Simulate pressing the arrow key 8 times
+          for (let i = 0; i < 8; i++) {
+            await delay(100);
+            await page.keyboard.press('ArrowRight');
+          }   
+          
+        } catch (e) {
+          // Handle any errors specific to watch.spectrum.com...
+          console.log('Error for watch.sling.com:', e);
+        }
+      }
+      
     } catch (e) {
       console.log('failed to stream', u, e)
     }
