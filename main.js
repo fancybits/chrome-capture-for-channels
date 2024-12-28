@@ -75,6 +75,8 @@ const getCurrentBrowser = async () => {
           '--enable-gpu-rasterization', 
           '--enable-oop-rasterization',
           '--disable-software-rasterizer', 
+          '--disable-gpu-vsync',
+          '--disable-frame-rate-limit',  // Removes FPS limiting
           '--enable-audio-output', // Ensure audio output is enabled
         ],
         ignoreDefaultArgs: [
