@@ -16,6 +16,16 @@ const viewport = {
   height: 1080,
 }
 
+const encodingParams = {
+  videoBitsPerSecond: 8000000,
+  audioBitsPerSecond: 320000,
+  videoCodec: 'h264_nvenc', // Use NVENC for video encoding
+  audioCodec: 'aac', // Use AAC for audio encoding
+  minFrameRate: 30,
+  maxFrameRate: 60,
+  mimeType: 'video/webm;codecs=H264',
+}
+
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -71,7 +81,7 @@ const getCurrentBrowser = async () => {
           '--disable-blink-features=AutomationControlled', // mitigates bot detection
           '--hide-scrollbars', // Hide scrollbars on captured pages
           '--hide-crash-restore-bubble', // Hide the yellow notification bar
-          '--window-size=1920,1080', // Set viewport resolution
+          '--window-size='+viewport.width+','+viewport.height, // Set viewport resolution
           '--disable-notifications', // Mimic real user behavior
           '--enable-accelerated-video-decode',
           '--enable-accelerated-video-encode', 
@@ -339,20 +349,21 @@ async function main() {
 
     try {
       const stream = await getStream(page, {
-        videoCodec: 'h264_nvenc', // Use NVENC for video encoding
-        //audioCodec: 'aac', // Use AAC for audio encoding
+        videoCodec: encodingParams.videoCodec,
+        audioCodec: encodingParams.audioCodec,
         video: true,
         audio: true,
-        videoBitsPerSecond: 6000000,
-        audioBitsPerSecond: 320000,
-        mimeType: 'video/webm;codecs=H264',
+        videoBitsPerSecond: encodingParams.videoBitsPerSecond,
+        audioBitsPerSecond: encodingParams.audioBitsPerSecond,
+        mimeType: encodingParams.mimeType,
         videoConstraints: {
           mandatory: {
             minWidth: viewport.width,
             minHeight: viewport.height,
             maxWidth: viewport.width,
             maxHeight: viewport.height,
-            minFrameRate: 30,
+            minFrameRate: encodingParams.minFrameRate,
+            maxFrameRate: encodingParams.maxFrameRate,
           },
         },
       })
