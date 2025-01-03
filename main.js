@@ -430,22 +430,23 @@ async function main() {
       if (u.includes("watch.sling.com")) {
         console.log("URL contains watch.sling.com");
         try {
+          // Div tag names can be found in the Chrome DevTools Layout tab
 
-          // Unmute screen after 9 tabs
-          for (let i = 0; i < 9; i++) {
-            await delay(200);
-            await page.keyboard.press('Tab');
-          }   
-          await page.keyboard.press('Enter');
-          
-          // Increase volume to max
-          // Simulate pressing the arrow key 10 times
+          // Click the full screen button
+          const fullScreenButton = await page.waitForSelector('div.player-button.active.videoPlayerFullScreenToggle');
+          await fullScreenButton.click(); //click for fullscreen
+
+          // Find Mute button and then use volume slider
+          const muteButton = await page.waitForSelector('div.player-button.active.volumeControls');
+          await muteButton.click(); //click unmute
+
+          // Simulate pressing the right arrow key 10 times to max volume
           for (let i = 0; i < 10; i++) {
             await delay(200);
             await page.keyboard.press('ArrowRight');
           }   
 
-          console.log("Selected Fullscreen and Unmuted");
+          console.log("Set Sling to Full Screen and Volume to max");
           
         } catch (e) {
           // Handle any errors specific to watch.spectrum.com...
