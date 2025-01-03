@@ -35,8 +35,11 @@ const getCurrentBrowser = async () => {
               `--disable-extensions-except=${path.join(dataDir, 'extension')}`,
             ])
           }
-          if (process.env.DOCKER || process.platform == 'win32') {
-            //opts.args = opts.args.concat(['--no-sandbox'])
+          if (process.platform == 'win32') {
+            opts.args = opts.args.concat([
+              '--use-gl=angle',
+              '--use-angle=d3d11on12'
+            ])
           }
           if (process.env.DOCKER) {
             opts.args = opts.args.concat([
@@ -45,7 +48,8 @@ const getCurrentBrowser = async () => {
               '--enable-features=VaapiVideoDecoder,VaapiVideoEncoder',
               '--ignore-gpu-blocklist',
               '--enable-zero-copy',
-              '--enable-drdc'
+              '--enable-drdc',
+              '--no-sandbox'
             ])
           }
           console.log("Launching Browser, Opts", opts);
@@ -429,15 +433,15 @@ async function main() {
 
           // Unmute screen after 9 tabs
           for (let i = 0; i < 9; i++) {
-            await delay(100);
+            await delay(200);
             await page.keyboard.press('Tab');
           }   
           await page.keyboard.press('Enter');
           
           // Increase volume to max
-          // Simulate pressing the arrow key 8 times
-          for (let i = 0; i < 8; i++) {
-            await delay(100);
+          // Simulate pressing the arrow key 10 times
+          for (let i = 0; i < 10; i++) {
+            await delay(200);
             await page.keyboard.press('ArrowRight');
           }   
 

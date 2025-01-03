@@ -4,6 +4,9 @@ Capture video and audio from a Chrome tab using the [`chrome.tabCapture`](https:
 
 ### setup
 
+See detailed installation/configuration instructions here:
+[Chrome Capture Thread](https://community.getchannels.com/t/chrome-capture-for-channels/36667/130)
+
 download the latest [release](https://github.com/fancybits/chrome-capture-for-channels/releases) for macOS or Windows
 
 or run in docker:
