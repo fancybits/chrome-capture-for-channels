@@ -29,7 +29,13 @@ const argv = require('yargs')
     alias: 'f',
     description: 'Minimum frame rate',
     type: 'number',
-    default: 60
+    default: 30
+  })
+  .option('port', {
+    alias: 'p',
+    description: 'Port number for the server',
+    type: 'number',
+    default: 5589
   })
   .option('width', {
     alias: 'w',
@@ -52,6 +58,14 @@ const argv = require('yargs')
   .version(false)  // Disable version number in help
   .argv;
 
+// Display settings
+console.log('Selected settings:');
+console.log(`Video Bitrate: ${argv.videoBitrate} bps (${argv.videoBitrate/1000000}Mbps)`);
+console.log(`Audio Bitrate: ${argv.audioBitrate} bps (${argv.audioBitrate/1000}kbps)`);
+console.log(`Minimum Frame Rate: ${argv.frameRate} fps`);
+console.log(`Port: ${argv.port}`);
+console.log(`Resolution: ${argv.width}x${argv.height}`);
+  
 const encodingParams = {
   videoBitsPerSecond: argv.videoBitrate,
   audioBitsPerSecond: argv.audioBitrate,
@@ -223,7 +237,7 @@ async function main() {
     }
     let out = path.join(dataDir, 'extension')
     fs.mkdirSync(out, {recursive: true})
-    ;['manifest.json', 'background.js', 'options.html', 'options.js'].forEach(file => {
+    ;['manifest.json', 'tsconfig.json', 'options.html', 'options.js'].forEach(file => {
       fs.copyFileSync(
         path.join(process.pkg.entrypoint, '..', 'node_modules', 'puppeteer-stream', 'extension', file),
         path.join(out, file)
@@ -339,9 +353,9 @@ async function main() {
       }[name]
     }
 
-    // Not sure why this is needed?
+    // Minimizing on Windows might cause more lag?  So only do it on Mac?
     var minimizeWindow = false
-    if (process.platform == 'darwin' && u.includes("www.nbc.com")) minimizeWindow = true
+    if (process.platform == 'darwin' && u.includes("www.nbc.com")) minimizeWindow = true;
 
     async function setupPage(browser) {
       
@@ -539,9 +553,9 @@ async function main() {
     }
   })
 
-  const server = app.listen(5589, () => {
-    console.log('Chrome Capture server listening on port 5589')
+  const server = app.listen(argv.port, () => {
+    console.log('Chrome Capture server listening on port', argv.port);
   })
 }
 
-main()
+main();
