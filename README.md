@@ -81,7 +81,7 @@ Examples:
 winget install -e --id Git.Git
 winget install -e --id OpenJS.NodeJS
 
-git clone https://github.com/fancybits/chrome-capture-for-channels
+git clone https://github.com/dravenst/chrome-capture-for-channels
 cd chrome-capture-for-channels
 npm install
 node main.js
@@ -92,7 +92,7 @@ node main.js
 ```
 brew install nodejs git
 
-git clone https://github.com/fancybits/chrome-capture-for-channels
+git clone https://github.com/dravenst/chrome-capture-for-channels
 cd chrome-capture-for-channels
 npm install
 node main.js
