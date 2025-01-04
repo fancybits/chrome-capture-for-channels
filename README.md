@@ -22,6 +22,8 @@ a http server is listening on port 5589 and responds to these routes. the respon
 - `/stream/<name>` for stream names registered in the code
 - `/stream?url=<url>` for other arbitrary URLs
 
+URL support includes www.nbc.com, slingTV, and Google Photo album slideshow
+
 setup a new Custom Channel using:
 
 ```
@@ -29,9 +31,30 @@ setup a new Custom Channel using:
 #EXTINF:-1 channel-id="weatherscan",Weatherscan
 chrome://x.x.x.x:5589/stream?url=https://weatherscan.net
 
+#EXTINF:-1 channel-id="Bravo (East)",Bravo (East)
+chrome://x.x.x.x:5589/stream/bravo
+
 #EXTINF:-1 channel-id="CC" tvg-chno="107" tvc-guide-stationid="62420", Comedy Central
 chrome://x.x.x.x:5589/stream?url=https://watch.sling.com/1/channel/29938328f60d447299ec48511a09ebab/watch
 
+#EXTINF:-1 channel-id=Google Album",Google Album
+chrome://x.x.x.x:5589/stream?url=https://photos.app.goo.gl/<yoursharedlinkhere>
+
+```
+
+### command line
+```
+Usage: node main.js [options]
+
+Options:
+  -v, --videoBitrate  Video bitrate in bits per second  [number] [default: 6000000]
+  -a, --audioBitrate  Audio bitrate in bits per second  [number] [default: 192000]
+  -f, --frameRate     Minimum frame rate  [number] [default: 60]
+  -h, --help          Show help  [boolean]
+
+Examples:
+  node main.js -v 6000000 -a 192000 -f 30             Capture at 6Mbps video, 192kbps audio, 30fps
+  node main.js --videoBitrate 8000000 --frameRate 60  High quality capture at 8Mbps and 60fps
 ```
 
 ### development

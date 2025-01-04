@@ -11,19 +11,48 @@ require('console-stamp')(console, {
   format: ':date(yyyy/mm/dd HH:MM:ss.l)',
 })
 
+// Parse command line arguments
+const argv = require('yargs')
+  .option('videoBitrate', {
+    alias: 'v',
+    description: 'Video bitrate in bits per second',
+    type: 'number',
+    default: 6000000
+  })
+  .option('audioBitrate', {
+    alias: 'a',
+    description: 'Audio bitrate in bits per second',
+    type: 'number',
+    default: 192000
+  })
+  .option('frameRate', {
+    alias: 'f',
+    description: 'Minimum frame rate',
+    type: 'number',
+    default: 60
+  })
+  .usage('Usage: $0 [options]')
+  .example('$0 -v 6000000 -a 192000 -f 30', 'Capture at 6Mbps video, 192kbps audio, 30fps')
+  .example('$0 --videoBitrate 8000000 --frameRate 60', 'High quality capture at 8Mbps and 60fps')
+  .wrap(null)  // Don't wrap help text
+  .help()
+  .alias('help', 'h')
+  .version(false)  // Disable version number in help
+  .argv;
+
+const encodingParams = {
+  videoBitsPerSecond: argv.videoBitrate,
+  audioBitsPerSecond: argv.audioBitrate,
+  videoCodec: 'h264_nvenc', // Use NVENC for video encoding
+  audioCodec: 'aac', // Use AAC for audio encoding
+  minFrameRate: argv.frameRate,
+  maxFrameRate: 60,
+  mimeType: 'video/webm;codecs=H264',
+}
+
 const viewport = {
   width: 1920,
   height: 1080,
-}
-
-const encodingParams = {
-  videoBitsPerSecond: 8000000,
-  audioBitsPerSecond: 320000,
-  videoCodec: 'h264_nvenc', // Use NVENC for video encoding
-  audioCodec: 'aac', // Use AAC for audio encoding
-  minFrameRate: 30,
-  maxFrameRate: 60,
-  mimeType: 'video/webm;codecs=H264',
 }
 
 function delay(ms) {
@@ -292,20 +321,15 @@ async function main() {
         nbcschicago: 'https://www.nbc.com/live?brand=rsn-chicago&callsign=nbcschicago',
         nbcsphiladelphia: 'https://www.nbc.com/live?brand=rsn-philadelphia&callsign=nbcsphiladelphia',
         nbcswashington: 'https://www.nbc.com/live?brand=rsn-washington&callsign=nbcswashington',
-        weatherscan: 'https://weatherscan.net/',
+        weatherscan: 'https://v2.weatherscan.net/',
         windy: 'https://windy.com',
         gpu: 'chrome://gpu',
       }[name]
     }
 
-    var waitForVideo = req.query.waitForVideo === 'false' ? false : true
-    switch (name) {
-      case 'weatherscan':
-      case 'windy':
-        waitForVideo = false
-    }
+    // Not sure why this is needed?
     var minimizeWindow = false
-    if (process.platform == 'darwin' && waitForVideo) minimizeWindow = true
+    if (process.platform == 'darwin' && u.includes("www.nbc.com")) minimizeWindow = true
 
     async function setupPage(browser) {
       
@@ -383,8 +407,41 @@ async function main() {
     }
 
     try {
+      // go to the page
       await page.goto(u)
-      if (waitForVideo) {
+
+      //  get some additional info about the page
+      const uiSize = await page.evaluate(`(function() {
+        return {
+          height: window.outerHeight - window.innerHeight,
+          width: window.outerWidth - window.innerWidth,
+        }
+      })()`)
+      const session = await page.target().createCDPSession()
+      const {windowId} = await session.send('Browser.getWindowForTarget')
+      await session.send('Browser.setWindowBounds', {
+        windowId,
+        bounds: {
+          height: viewport.height + uiSize.height,
+          width: viewport.width + uiSize.width,
+        },
+      })
+      if (minimizeWindow) {
+        await session.send('Browser.setWindowBounds', {
+          windowId,
+          bounds: {
+            windowState: 'minimized',
+          },
+        })
+      }
+    } catch (e) {
+      console.log('failed to goto page and setup window', u, e)
+    }
+
+    // For NBC, look for video element and wait for it to be ready
+    if (u.includes("www.nbc.com")) {
+      console.log("URL contains www.nbc.com");
+      try {
         await page.waitForSelector('video')
         await page.waitForFunction(`(function() {
           let video = document.querySelector('video')
@@ -411,62 +468,62 @@ async function main() {
             header.style.zIndex = '0'
           }
         })()`)
+
+      } catch (e) {
+        console.log('failed to start stream', u, e)
       }
+    }
 
-      const uiSize = await page.evaluate(`(function() {
-        return {
-          height: window.outerHeight - window.innerHeight,
-          width: window.outerWidth - window.innerWidth,
-        }
-      })()`)
-      const session = await page.target().createCDPSession()
-      const {windowId} = await session.send('Browser.getWindowForTarget')
-      await session.send('Browser.setWindowBounds', {
-        windowId,
-        bounds: {
-          height: viewport.height + uiSize.height,
-          width: viewport.width + uiSize.width,
-        },
-      })
-      if (minimizeWindow) {
-        await session.send('Browser.setWindowBounds', {
-          windowId,
-          bounds: {
-            windowState: 'minimized',
-          },
-        })
+    // Handle Sling TV
+    else if (u.includes("watch.sling.com")) {
+      console.log("URL contains watch.sling.com");
+      try {
+        // Div tag names can be found in the Chrome DevTools Layout tab
+
+        // Click the full screen button
+        const fullScreenButton = await page.waitForSelector('div.player-button.active.videoPlayerFullScreenToggle');
+        await fullScreenButton.click(); //click for fullscreen
+
+        // Find Mute button and then use volume slider
+        const muteButton = await page.waitForSelector('div.player-button.active.volumeControls');
+        await muteButton.click(); //click unmute
+
+        // Simulate pressing the right arrow key 10 times to max volume
+        for (let i = 0; i < 10; i++) {
+          await delay(200);
+          await page.keyboard.press('ArrowRight');
+        }   
+
+        console.log("Set Sling to Full Screen and Volume to max");
+        
+      } catch (e) {
+        // Handle any errors specific to watch.spectrum.com...
+        console.log('Error for watch.sling.com:', e);
       }
+    }
 
-      // Handle Sling TV
-      if (u.includes("watch.sling.com")) {
-        console.log("URL contains watch.sling.com");
-        try {
-          // Div tag names can be found in the Chrome DevTools Layout tab
+    // Handle Google Photos
+    else if (u.includes("photos.app.goo.gl")) {
+      console.log("URL contains photos.app.goo.gl");
+      try {
+        
+        // Simulate pressing the tab key key 10 times to get to the More Options button
+        for (let i = 0; i < 8; i++) {
+          await delay(200);
+          await page.keyboard.press('Tab');
+        }   
 
-          // Click the full screen button
-          const fullScreenButton = await page.waitForSelector('div.player-button.active.videoPlayerFullScreenToggle');
-          await fullScreenButton.click(); //click for fullscreen
-
-          // Find Mute button and then use volume slider
-          const muteButton = await page.waitForSelector('div.player-button.active.volumeControls');
-          await muteButton.click(); //click unmute
-
-          // Simulate pressing the right arrow key 10 times to max volume
-          for (let i = 0; i < 10; i++) {
-            await delay(200);
-            await page.keyboard.press('ArrowRight');
-          }   
-
-          console.log("Set Sling to Full Screen and Volume to max");
-          
-        } catch (e) {
-          // Handle any errors specific to watch.spectrum.com...
-          console.log('Error for watch.sling.com:', e);
-        }
+        // Press Enter twice to start Slideshow
+        await page.keyboard.press('Enter');
+        await delay(200);
+        await page.keyboard.press('Enter');
+        
+        console.log("Started Google Slideshow");
+        
+      } catch (e) {
+        // Handle any errors specific to photos.google.com...
+        console.log('Error for photos.google.com:', e);
       }
-      
-    } catch (e) {
-      console.log('failed to stream', u, e)
     }
   })
 
