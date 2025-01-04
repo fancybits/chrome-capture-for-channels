@@ -31,12 +31,24 @@ const argv = require('yargs')
     type: 'number',
     default: 60
   })
+  .option('width', {
+    alias: 'w',
+    description: 'Video width in pixels (e.g., 1920 for 1080p)',
+    type: 'number',
+    default: 1920,
+  })
+  .option('height', {
+    alias: 'h', 
+    description: 'Video height in pixels (e.g., 1080 for 1080p)',
+    type: 'number',
+    default: 1080,
+  })
   .usage('Usage: $0 [options]')
-  .example('$0 -v 6000000 -a 192000 -f 30', 'Capture at 6Mbps video, 192kbps audio, 30fps')
-  .example('$0 --videoBitrate 8000000 --frameRate 60', 'High quality capture at 8Mbps and 60fps')
+  .example('$0 -v 6000000 -a 192000 -f 30 -w 1920 -h 1080', 'Capture at 6Mbps video, 192kbps audio, 30fps, 1920x1080')
+  .example('$0 --videoBitrate 8000000 --frameRate 60 --width 1920 --height 1080', 'High quality capture at 8Mbps and 60fpsm 1920x1080')
   .wrap(null)  // Don't wrap help text
   .help()
-  .alias('help', 'h')
+  .alias('help', '?')
   .version(false)  // Disable version number in help
   .argv;
 
@@ -51,8 +63,8 @@ const encodingParams = {
 }
 
 const viewport = {
-  width: 1920,
-  height: 1080,
+  width: argv.width,
+  height: argv.height,
 }
 
 function delay(ms) {

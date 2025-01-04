@@ -50,11 +50,13 @@ Options:
   -v, --videoBitrate  Video bitrate in bits per second  [number] [default: 6000000]
   -a, --audioBitrate  Audio bitrate in bits per second  [number] [default: 192000]
   -f, --frameRate     Minimum frame rate  [number] [default: 60]
-  -h, --help          Show help  [boolean]
+  -w, --width         Video width in pixels (e.g., 1920 for 1080p)  [number] [default: 1920]
+  -h, --height        Video height in pixels (e.g., 1080 for 1080p)  [number] [default: 1080]
+  -?, --help          Show help  [boolean]
 
 Examples:
-  node main.js -v 6000000 -a 192000 -f 30             Capture at 6Mbps video, 192kbps audio, 30fps
-  node main.js --videoBitrate 8000000 --frameRate 60  High quality capture at 8Mbps and 60fps
+  node main.js -v 6000000 -a 192000 -f 30 -w 1920 -h 1080
+  node main.js --videoBitrate 8000000 --frameRate 60 --width 1920 --height 1080
 ```
 
 ### development
