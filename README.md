@@ -9,12 +9,6 @@ See detailed installation/configuration instructions here:
 
 download the latest [release](https://github.com/dravenst/chrome-capture-for-channels/releases) for Windows
 
-or run in docker:
-
-```
-docker run -d --name chrome-capture -p 5589:5589 fancybits/chrome-capture-for-channels
-```
-
 ### usage
 
 a http server is listening on port 5589 and responds to these routes. the response is a webm stream with h264 video and opus audio.
