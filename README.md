@@ -63,11 +63,13 @@ Usage: node main.js [options]
 
 Options:
   -v, --videoBitrate  Video bitrate in bits per second  [number] [default: 6000000]
-  -a, --audioBitrate  Audio bitrate in bits per second  [number] [default: 192000]
-  -f, --frameRate     Minimum frame rate  [number] [default: 60]
+  -a, --audioBitrate  Audio bitrate in bits per second  [number] [default: 256000]
+  -f, --frameRate     Minimum frame rate  [number] [default: 30]
   -p, --port          Port number for the server  [number] [default: 5589]
   -w, --width         Video width in pixels (e.g., 1920 for 1080p)  [number] [default: 1920]
   -h, --height        Video height in pixels (e.g., 1080 for 1080p)  [number] [default: 1080]
+  -i, --videoCodec    Video codec (e.g., h264_nvenc, h264_qsv, h264_amf, h264_vaapi)  [string] [default: "h264_nvenc"]
+  -u, --audioCodec    Audio codec (e.g., aac, opus)  [string] [default: "aac"]
   -?, --help          Show help  [boolean]
 
 Examples:

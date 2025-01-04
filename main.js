@@ -23,7 +23,7 @@ const argv = require('yargs')
     alias: 'a',
     description: 'Audio bitrate in bits per second',
     type: 'number',
-    default: 192000
+    default: 256000
   })
   .option('frameRate', {
     alias: 'f',
@@ -49,9 +49,21 @@ const argv = require('yargs')
     type: 'number',
     default: 1080,
   })
+  .option('videoCodec', {
+    alias: 'i', 
+    description: 'Video codec (e.g., h264_nvenc, h264_qsv, h264_amf, h264_vaapi)',
+    type: 'string',
+    default: 'h264_nvenc',
+  })
+  .option('audioCodec', {
+    alias: 'u', 
+    description: 'Audio codec (e.g., aac, opus)',
+    type: 'string',
+    default: 'aac',
+  })
   .usage('Usage: $0 [options]')
   .example('$0 -v 6000000 -a 192000 -f 30 -w 1920 -h 1080', 'Capture at 6Mbps video, 192kbps audio, 30fps, 1920x1080')
-  .example('$0 --videoBitrate 8000000 --frameRate 60 --width 1920 --height 1080', 'High quality capture at 8Mbps and 60fpsm 1920x1080')
+  .example('$0 --videoBitrate 8000000 --audioBitrate 320000 --frameRate 60 --width 1920 --height 1080', 'High quality capture at 8Mbps and 60fpsm 1920x1080')
   .wrap(null)  // Don't wrap help text
   .help()
   .alias('help', '?')
@@ -65,12 +77,14 @@ console.log(`Audio Bitrate: ${argv.audioBitrate} bps (${argv.audioBitrate/1000}k
 console.log(`Minimum Frame Rate: ${argv.frameRate} fps`);
 console.log(`Port: ${argv.port}`);
 console.log(`Resolution: ${argv.width}x${argv.height}`);
+console.log(`Video Codec: ${argv.videoCodec}`);
+console.log(`Audio Codec: ${argv.audioCodec}`);
   
 const encodingParams = {
   videoBitsPerSecond: argv.videoBitrate,
   audioBitsPerSecond: argv.audioBitrate,
-  videoCodec: 'h264_nvenc', // Use NVENC for video encoding
-  audioCodec: 'aac', // Use AAC for audio encoding
+  videoCodec: argv.videoCodec, // Use NVENC for video encoding
+  audioCodec: argv.audioCodec, // Use AAC for audio encoding
   minFrameRate: argv.frameRate,
   maxFrameRate: 60,
   mimeType: 'video/webm;codecs=H264',
