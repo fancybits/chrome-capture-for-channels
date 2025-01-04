@@ -18,6 +18,8 @@
   },
   "pkg": {
     "targets": [
+      "latest-macos-arm64",
+      "latest-macos-x64",
       "latest-win-x64"
     ],
     "assets": [
