@@ -16,7 +16,7 @@ a http server is listening on port 5589 and responds to these routes. the respon
 - `/stream/<name>` for stream names registered in the code
 - `/stream?url=<url>` for other arbitrary URLs
 
-URL support includes www.nbc.com, slingTV, and Google Photo album slideshow
+URL support includes www.nbc.com, slingTV, Google Photo album slideshow, and early testing support for directv
 
 setup a new Custom Channel using:
 
@@ -28,11 +28,18 @@ chrome://x.x.x.x:5589/stream?url=https://weatherscan.net
 #EXTINF:-1 channel-id="Bravo (East)",Bravo (East)
 chrome://x.x.x.x:5589/stream/bravo
 
-#EXTINF:-1 channel-id="CC" tvg-chno="107" tvc-guide-stationid="62420", Comedy Central
+#EXTINF:-1 channel-id="CC" channel-number="107" tvc-guide-stationid="62420", Comedy Central
 chrome://x.x.x.x:5589/stream?url=https://watch.sling.com/1/channel/29938328f60d447299ec48511a09ebab/watch
 
 #EXTINF:-1 channel-id=Google Album",Google Album
 chrome://x.x.x.x:5589/stream?url=https://photos.app.goo.gl/(rest of link from a shared album here)
+
+#EXTINF:-1 channel-id="golf" channel-number="401" tvc-guide-stationid="61854", GOLFHD
+chrome://192.168.50.109:5589/stream?url=https://watch.sling.com/1/channel/e7c98734f996492187bb868ce5655a0e/watch
+
+#EXTINF:-1 channel-id="ESPN",ESPN
+chrome://x.x.x.x:5589/stream?url=http://stream.directv.com/guide/&ch=1234
+
 
 ```
 

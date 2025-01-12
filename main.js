@@ -157,9 +157,7 @@ const getCurrentBrowser = async () => {
           '--enable-features=UseSurfaceLayerForVideoCapture',
           '--enable-gpu-rasterization', 
           '--enable-oop-rasterization',
-          '--disable-software-rasterizer', 
           '--disable-gpu-vsync',
-          '--disable-frame-rate-limit',  // Removes FPS limiting
           '--enable-audio-output', // Ensure audio output is enabled
         ],
         ignoreDefaultArgs: [
@@ -239,29 +237,29 @@ const getExecutablePath = () => {
 }
 
 async function main() {
-  dataDir = process.cwd()
+  dataDir = process.cwd();
   if (process.pkg) {
     switch (process.platform) {
       case 'darwin':
-        dataDir = path.join(process.env.HOME, 'Library', 'Application Support', 'ChromeCapture')
-        break
+        dataDir = path.join(process.env.HOME, 'Library', 'Application Support', 'ChromeCapture');
+        break;
       case 'win32':
-        dataDir = path.join(process.env.USERPROFILE, 'AppData', 'Local', 'ChromeCapture')
-        break
+        dataDir = path.join(process.env.USERPROFILE, 'AppData', 'Local', 'ChromeCapture');
+        break;
     }
-    let out = path.join(dataDir, 'extension')
-    fs.mkdirSync(out, {recursive: true})
-    ;['manifest.json', 'tsconfig.json', 'options.html', 'options.js'].forEach(file => {
+    let out = path.join(dataDir, 'extension');
+    fs.mkdirSync(out, {recursive: true});
+    ['manifest.json', 'tsconfig.json', 'options.html', 'options.js'].forEach(file => {
       fs.copyFileSync(
         path.join(process.pkg.entrypoint, '..', 'node_modules', 'puppeteer-stream', 'extension', file),
         path.join(out, file)
-      )
-    })
+      );
+    });
   }
 
-  const app = express()
+  const app = express();
 
-  const df = require('dateformat')
+  const df = require('dateformat');
   morgan.token('mydate', function (req) {
     return df(new Date(), 'yyyy/mm/dd HH:MM:ss.l')
   })
@@ -334,6 +332,7 @@ async function main() {
 
   app.get('/stream/:name?', async (req, res) => {
     var u = req.query.url
+
     let name = req.params.name
     if (name) {
       u = {
@@ -565,6 +564,46 @@ async function main() {
         console.log('Error for photos.google.com:', e);
       }
     }
+
+    // Handle DirecTV Stream
+    else if (u.includes("stream.directv.com")) {
+      console.log("URL contains stream.directv.com");
+      try {
+
+        // Extract the channel name from the "ch" query parameter of the URL
+        // e.g. http://localhost:5589/stream?url=http://stream.directv.com/guide&ch=1234
+        const channel = req.query.ch;
+
+        // Simulate pressing the Tab key 6 times
+        for (let i = 0; i < 6; i++) {
+            await delay(500);
+            await page.keyboard.press('Tab');
+        }
+        console.log('Searching DirecTVStream Channel List for: ', channel);
+        await page.keyboard.type(channel); // Use the variable without quotes      
+        await delay(1115);
+        await page.mouse.click(755, 150, { button: 'left' }); // Second click (left-click) - Only line added
+        console.log('Waiting for channel load: ' + channel);
+        await delay(10000);
+        console.log('Channel loaded, going Full Screen: ' + channel);
+
+        // Trigger fullscreen mode using the Fullscreen API
+        await page.evaluate(() => {
+          const element = document.documentElement;
+          if (element.requestFullscreen) {
+            element.requestFullscreen();
+          } else if (element.mozRequestFullScreen) {
+            element.mozRequestFullScreen();
+          } else if (element.webkitRequestFullscreen) {
+            element.webkitRequestFullscreen();
+          } else if (element.msRequestFullscreen) {
+            element.msRequestFullscreen();
+          }
+        });
+      } catch (e) {
+        console.log('Error for stream.directv.com:', e);
+      }
+    } 
   })
 
   const server = app.listen(argv.port, () => {
@@ -572,4 +611,7 @@ async function main() {
   })
 }
 
-main();
+main().catch(err => {
+  console.error(err);
+  process.exit(1);
+});
