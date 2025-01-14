@@ -392,7 +392,8 @@ async function main() {
         const text = msg.text();
         // Filter out messages containing "Mixed Content"
         if (!text.includes("Mixed Content")) {
-          console.log(text);
+          // UNCOMMENT THIS LINE TO SEE ALL BROWSER MESSAGES
+          //console.log(text);  
         }
       });
 
@@ -431,13 +432,38 @@ async function main() {
         },
       })
 
+      // Handle stream events
+      stream.on('error', (err) => {
+        console.log('Stream error:', err)
+      })
+
+      stream.on('end', () => {
+        console.log('Stream ended naturally')
+      })
+
       console.log('streaming', u)
       stream.pipe(res)
+
+      // Handle response events - close event is expected
       res.on('close', async err => {
-        await stream.destroy()
+        console.log('received close event on response')
+        stream.destroy()
         await page.close()
         console.log('finished', u)
       })
+
+      res.on('error', async err => {
+        console.log('error on response:', err)
+        stream.destroy()
+        await page.close()
+      })
+      
+      res.on('finish', async err => {
+        console.log('Response finished')
+        stream.destroy()
+        await page.close()
+      })
+
     } catch (e) {
       console.log('failed to start stream', u, e)
       res.status(500).send(`failed to start stream: ${e}`)

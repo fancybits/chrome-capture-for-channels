@@ -1,99 +1,114 @@
 #EXTM3U
 
-#EXTINF:-1 channel-id="Bravo (East)",Bravo (East)
+#EXTINF:-1 channel-id="Bravo (East)" tvc-guide-stationid="58625",Bravo (East)
 chrome://localhost:5589/stream/bravo
 
 #EXTINF:-1 channel-id="Bravo (West)",Bravo (West)
 chrome://localhost:5589/stream/bravop
 
-#EXTINF:-1 channel-id="E! (East)",E! (East)
+#EXTINF:-1 channel-id="E! (East)" tvc-guide-stationid="61812",E! (East)
 chrome://localhost:5589/stream/e
 
 #EXTINF:-1 channel-id="E! (West)",E! (West)
 chrome://localhost:5589/stream/ep
 
-#EXTINF:-1 channel-id="Oxygen (East)",Oxygen (East)
+#EXTINF:-1 channel-id="Oxygen (East)" tvc-guide-stationid="70522",Oxygen (East)
 chrome://localhost:5589/stream/oxygen
 
 #EXTINF:-1 channel-id="Oxygen (West)",Oxygen (West)
 chrome://localhost:5589/stream/oxygenp
 
-#EXTINF:-1 channel-id="SyFy (East)",SyFy (East)
+#EXTINF:-1 channel-id="SyFy (East)" tvc-guide-stationid="58623" ,SyFy (East)
 chrome://localhost:5589/stream/syfy
 
 #EXTINF:-1 channel-id="SyFy (West)",SyFy (West)
 chrome://localhost:5589/stream/syfyp
 
-#EXTINF:-1 channel-id="USA (East)",USA (East)
+#EXTINF:-1 channel-id="USA (East)" tvc-guide-stationid="58452",USA (East)
 chrome://localhost:5589/stream/usa
 
 #EXTINF:-1 channel-id="USA (West)",USA (West)
 chrome://localhost:5589/stream/usap
 
-#EXTINF:-1 channel-id="Windy",Windy
+#EXTINF:-1 channel-id="Windy" tvc-guide-placeholders="3600",Windy
 chrome://localhost:5589/stream/windy
 
-#EXTINF:-1 channel-id="Weatherscan",Weatherscan
+#EXTINF:-1 channel-id="Weatherscan" tvc-guide-placeholders="3600",Weatherscan
 chrome://localhost:5589/stream/weatherscan
 
-#EXTINF:-1 channel-id="NBC News Now",NBC News Now
+#EXTINF:-1 channel-id="NBC News Now" tvc-guide-stationid="114174",NBC News Now
 chrome://localhost:5589/stream/nbcnews
 
-#EXTINF:-1 channel-id="Paramount+",Paramount+
+#EXTINF:-1 channel-id="Paramount+" tvc-guide-stationid="59186" channel-number="241",Paramount+
 chrome://localhost:5589/stream?url=https://watch.sling.com/1/channel/e8cabe959f194a7b97b1c807dc9b267e/watch
 
-#EXTINF:-1 channel-id="Paramount+Showtime",Paramount+Showtime
+#EXTINF:-1 channel-id="Paramount+Showtime" tvc-guide-stationid="21868" channel-number="545",Paramount+Showtime
 chrome://localhost:5589/stream?url=https://watch.sling.com/1/channel/7f5f5993457648d68db2fa5d5103cbcc/watch
 
-#EXTINF:-1 channel-id="Paramount+ShowtimeW",Paramount+ShowtimeW
+#EXTINF:-1 channel-id="Paramount+ShowtimeW" tvc-guide-stationid="22532" channel-number="546",Paramount+ShowtimeW
 chrome://localhost:5589/stream?url=https://watch.sling.com/1/channel/f8ee74606d2a47ec8ca14842b2762b9b/watch
 
-#EXTINF:-1 channel-id="Showtime2",Showtime2
+#EXTINF:-1 channel-id="Showtime2" tvc-guide-stationid="58533" channel-number="547",Showtime2
 chrome://localhost:5589/stream?url=https://watch.sling.com/1/channel/30b674a6204f4d9b8ec053e0f6381a28/watch
 
-#EXTINF:-1 channel-id="ShowtimeExtreme",ShowtimeExtreme
+#EXTINF:-1 channel-id="ShowtimeExtreme" tvc-guide-stationid="60947" channel-number="549",ShowtimeExtreme
 chrome://localhost:5589/stream?url=https://watch.sling.com/1/channel/ea47544f20394a4b83a2c0678c078d66/watch
 
-#EXTINF:-1 channel-id="ShowtimeNext",ShowtimeNext
+#EXTINF:-1 channel-id="ShowtimeNext" tvc-guide-stationid="25270" channel-number="551",ShowtimeNext
 chrome://localhost:5589/stream?url=https://watch.sling.com/1/channel/b5540f5fb9b542aeb0f253d9854c174f/watch
 
-#EXTINF:-1 channel-id="Starz",Starz
+#EXTINF:-1 channel-id="ShowtimeClassic" tvc-guide-stationid="61001" channel-number="550",ShowtimeClassic
+chrome://localhost:5589/stream?url=https://watch.sling.com/1/channel/b24b20f009e94eb1ad2441a19f98b7ff/watch
+
+#EXTINF:-1 channel-id="Starz" tvc-guide-stationid="34941" channel-number="525",Starz
 chrome://localhost:5589/stream?url=https://watch.sling.com/1/channel/1a3c345b84b149918e0bad8f797df70a/watch
 
-#EXTINF:-1 channel-id="Starz Cinema",Starz Cinema
+#EXTINF:-1 channel-id="Starz West" tvc-guide-stationid="34949" channel-number="526", Starz West
+chrome://localhost:5589/stream?url=https://watch.sling.com/1/channel/8a84458592844ff5849712ef7766fb4e/watch
+
+#EXTINF:-1 channel-id="Starz Cinema" tvc-guide-stationid="67236" channel-number="531",Starz Cinema
 chrome://localhost:5589/stream?url=https://watch.sling.com/1/channel/0eedb59656d243da914fef990a8db903/watch
 
-#EXTINF:-1 channel-id="Starz Comedy",Starz Comedy
+#EXTINF:-1 channel-id="Starz Comedy" tvc-guide-stationid="57569" channel-number="528",Starz Comedy
 chrome://localhost:5589/stream?url=https://watch.sling.com/1/channel/d96b102ac5c54967bf56b8b57e20c84e/watch
 
-#EXTINF:-1 channel-id="CC" tvg-chno="107" tvc-guide-stationid="62420", Comedy Central
+#EXTINF:-1 channel-id="CC" tvc-guide-stationid="62420" channel-number="249", Comedy Central
 chrome://localhost:5589/stream?url=https://watch.sling.com/1/channel/29938328f60d447299ec48511a09ebab/watch
 
-#EXTINF:-1 channel-id="BBCA" tvg-chno="135" tvc-guide-stationid="64492",BBC America
+#EXTINF:-1 channel-id="BBCA" tvc-guide-stationid="64492" channel-number="264",BBC America
 chrome://localhost:5589/stream?url=https://watch.sling.com/1/channel/2a915617329d4e87b5a83b68c39b9229/watch
 
-#EXTINF:-1 channel-id="MGM+" tvg-chno="292" tvc-guide-stationid="68409", MGM+ Drive-in
+#EXTINF:-1 channel-id="MGM+" tvc-guide-stationid="68409" channel-number="558", MGM+ Drive-in
 chrome://localhost:5589/stream?url=https://watch.sling.com/1/channel/1594693b9724433086fb3f55d3f2e5a8/watch
 
-#EXTINF:-1 channel-id="CARTOON" tvg-chno="176" tvc-guide-stationid="60048", CARTOON
+#EXTINF:-1 channel-id="MGMHITS" tvc-guide-stationid="67929" channel-number="559",MGM Hits
+chrome://localhost:5589/stream?url=https://watch.sling.com/1/channel/a037e2a30fd249b98d09fbb56dfdeb3f/watch
+
+#EXTINF:-1 channel-id="MGMMR" tvc-guide-stationid="74073" channel-number="560",MGM Marquee
+chrome://localhost:5589/stream?url=https://watch.sling.com/1/channel/8686b39e8fa74b0daa8b0f80069c1ac1/watch
+
+#EXTINF:-1 channel-id="MGMDRV" tvc-guide-stationid="68409" channel-number="561",MGM+ Drive-in
+chrome://locahost:5589/stream?url=https://watch.sling.com/1/channel/1594693b9724433086fb3f55d3f2e5a8/watch
+
+#EXTINF:-1 channel-id="CARTOON" tvc-guide-stationid="60048" channel-number="296", CARTOON
 chrome://localhost:5589/stream?url=https://watch.sling.com/1/channel/ab508c097c5b41cbb0626dcc3fc9470a/watch
 
-#EXTINF:-1 channel-id="nbatv" tvg-chno="156" tvc-guide-stationid="45526", NBATV
+#EXTINF:-1 channel-id="nbatv" tvc-guide-stationid="45526" channel-number="216", NBATV
 chrome://localhost:5589/stream?url=https://watch.sling.com/1/channel/0e87a84170da4646aa90528abfcbe2a9/watch
 
-#EXTINF:-1 channel-id="mlbn" tvg-chno="152" tvc-guide-stationid="62081", MLBHD
+#EXTINF:-1 channel-id="mlbn" tvc-guide-stationid="62081" channel-number="213", MLBHD
 chrome://localhost:5589/stream?url=https://watch.sling.com/1/channel/db0e2f29bb004fb99282e792845aefcf/watch
 
-EXTINF:-1 channel-id="NFLN",NFL Network
+EXTINF:-1 channel-id="NFLN" tvc-guide-stationid="45399" channel-number="212",NFL Network
 chrome://localhost:5589/stream?url=https://watch.sling.com/1/channel/8a595ee9235f4d7f8b95dd35d268cdd5/watch
 
-#EXTINF:-1 channel-id="nflrz" tvg-chno="155" tvc-guide-stationid="65025", NFLNRZD
+#EXTINF:-1 channel-id="nflrz" tvc-guide-stationid="65025" channel-number="211", NFLNRZD
 chrome://localhost:5589/stream?url=https://watch.sling.com/1/channel/7bd920fabfd242018e3e5ea5469b1e88/watch
 
-#EXTINF:-1 channel-id="golf" tvg-chno="401" tvc-guide-stationid="61854", GOLFHD
+#EXTINF:-1 channel-id="golf" tvc-guide-stationid="61854" channel-number="218", GOLFHD
 chrome://localhost:5589/stream?url=https://watch.sling.com/1/channel/e7c98734f996492187bb868ce5655a0e/watch
 
-#EXTINF:-1 channel-id="bein" tvg-chno="392" tvc-guide-stationid="76950", BEIN1HD
+#EXTINF:-1 channel-id="bein" tvc-guide-stationid="76950", BEIN1HD
 chrome://localhost:5589/stream?url=https://watch.sling.com/1/channel/9125fbd1c6cd4c93b01387201878f063/watch
 
 
