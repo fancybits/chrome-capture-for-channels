@@ -7,18 +7,18 @@ Capture video and audio from a Chrome tab using the [`chrome.tabCapture`](https:
 See detailed installation/configuration instructions here:
 [Chrome Capture Thread](https://community.getchannels.com/t/chrome-capture-for-channels/36667/130)
 
-download the latest [release](https://github.com/dravenst/chrome-capture-for-channels/releases) for Windows
+Download the latest [release](https://github.com/dravenst/chrome-capture-for-channels/releases) for Windows
 
 ### usage
 
-a http server is listening on port 5589 and responds to these routes. the response is a webm stream with h264 video and opus audio.
+An http server is listening on port 5589 and responds to these routes. the response is a webm stream with h264 video and opus audio.
 
 - `/stream/<name>` for stream names registered in the code
 - `/stream?url=<url>` for other arbitrary URLs
 
 URL support includes www.nbc.com, slingTV, Google Photo album slideshow, and early testing support for directv
 
-setup a new Custom Channel using:
+Setup a new Custom Channel using:
 
 ```
 #EXTM3U
@@ -45,19 +45,23 @@ chrome://x.x.x.x:5589/stream?url=http://stream.directv.com/guide/&ch=1234
 
 ### windows service install
 
-Download the executable file (i.e. chrome-capture-for-channels-win-x64.exe)
+Download the executable file from the latest [release](https://github.com/dravenst/chrome-capture-for-channels/releases) (i.e. `chrome-capture-for-channels-win-x64.exe`)
 
-Create a file called `channels-win-x64.ps1` and add the following line to it (replacing `(YOUR-PATH)` with your path):
+Create a new text file called `channels-win-x64.ps1` and add the following line to it (replacing `(YOUR-PATH)` with your path to where you stored the .exe file):
 `Start-Process -WindowStyle hidden "(YOUR-PATH)\chrome-capture-for-channels-win-x64.exe"`
 
-For Windows, create a new task to run the .ps1 file above in Windows Task Scheduler with the highest privileges, and set it to trigger it when the user logs on (this is critical to enable the GPU).
+For Windows, create a new task to run the `channels-win-x64.ps1` file above in Windows Task Scheduler with the highest privileges, and set it to trigger it when the user logs on (it's critical to run after user login to enable the GPU).
 
-Run the task manually and be sure to visit all of the planned streaming sites within the browser that pops up after you try to stream your first channel.  This will allow you to login to the site and retain the credentials. 
+Run the new Windows task you created manually to test it and be sure to visit all of the streaming sites within the browser that pops up after you try to stream your first channel.  This will allow you to login to the sites and retain the credentials for later runs. (Note: the browser data directory is created in a different location so any previous browser credentials won't be available.)
 
+Other notes: 
+
+- Add additional startup parameters (listed below) as necessary to the `channels-win-x64.ps1` file (e.g. change the default video codec if you don't have an Nvidia GPU)
+- The browser will attempt to run the video in full screen mode.  It is important not to run any other browsers/apps in full screen while this is running as it will significantly impact streaming performance.
 
 ### development
 
-to setup a development environment where you can edit and run `main.js`, follow the OS environment setup below
+To setup a development environment where you can edit and run `main.js`, follow the appropriate OS environment installation and setup instructions below and then run `node main.js` with the options listed below.
 
 ```
 Usage: node main.js [options]
@@ -106,4 +110,4 @@ node main.js
 ```
 npm run build
 ```
-(For building on Windows, open package.json, look under targets, and remove everything besides latest-win-x64.)
+(For building on Windows, open package.json, look under "targets", and remove everything besides latest-win-x64.)

@@ -9,13 +9,13 @@ chrome://localhost:5589/stream/bravop
 #EXTINF:-1 channel-id="E! (East)" tvc-guide-stationid="61812",E! (East)
 chrome://localhost:5589/stream/e
 
-#EXTINF:-1 channel-id="E! (West)",E! (West)
+#EXTINF:-1 channel-id="E! (West)" tvc-guide-stationid="17561",E! (West)
 chrome://localhost:5589/stream/ep
 
 #EXTINF:-1 channel-id="Oxygen (East)" tvc-guide-stationid="70522",Oxygen (East)
 chrome://localhost:5589/stream/oxygen
 
-#EXTINF:-1 channel-id="Oxygen (West)",Oxygen (West)
+#EXTINF:-1 channel-id="Oxygen (West)" tvc-guide-stationid="21744",Oxygen (West)
 chrome://localhost:5589/stream/oxygenp
 
 #EXTINF:-1 channel-id="SyFy (East)" tvc-guide-stationid="58623" ,SyFy (East)
@@ -27,7 +27,7 @@ chrome://localhost:5589/stream/syfyp
 #EXTINF:-1 channel-id="USA (East)" tvc-guide-stationid="58452",USA (East)
 chrome://localhost:5589/stream/usa
 
-#EXTINF:-1 channel-id="USA (West)",USA (West)
+#EXTINF:-1 channel-id="USA (West)" tvc-guide-stationid="74030",USA (West)
 chrome://localhost:5589/stream/usap
 
 #EXTINF:-1 channel-id="Windy" tvc-guide-placeholders="3600",Windy

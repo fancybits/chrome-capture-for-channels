@@ -138,6 +138,7 @@ const getCurrentBrowser = async () => {
       {
         executablePath: getExecutablePath(),
         pipe: true, // more robust to keep browser connection from disconnecting
+        headless: false,
         defaultViewport: null, // no viewport emulation
         userDataDir: path.join(dataDir, 'chromedata'),
         args: [
@@ -484,6 +485,7 @@ async function main() {
       })()`)
       const session = await page.target().createCDPSession()
       const {windowId} = await session.send('Browser.getWindowForTarget')
+
       await session.send('Browser.setWindowBounds', {
         windowId,
         bounds: {
