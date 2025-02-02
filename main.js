@@ -114,12 +114,6 @@ const getCurrentBrowser = async () => {
               `--disable-extensions-except=${path.join(dataDir, 'extension')}`,
             ])
           }
-          if (process.platform == 'win32') {
-            opts.args = opts.args.concat([
-              '--use-gl=angle',
-              '--use-angle=d3d11on12'
-            ])
-          }
           if (process.env.DOCKER) {
             opts.args = opts.args.concat([
               '--use-gl=angle',
@@ -142,23 +136,17 @@ const getCurrentBrowser = async () => {
         userDataDir: path.join(dataDir, 'chromedata'),
         args: [
           '--no-first-run', // Skip first run wizards
-          '--disable-infobars',
           '--hide-crash-restore-bubble',
           '--allow-running-insecure-content',  // Sling has both https and http
           '--autoplay-policy=no-user-gesture-required',
-          '--log-level=2', // error level only
           '--disable-blink-features=AutomationControlled', // mitigates bot detection
           '--hide-scrollbars', // Hide scrollbars on captured pages
-          '--hide-crash-restore-bubble', // Hide the yellow notification bar
           '--window-size='+viewport.width+','+viewport.height, // Set viewport resolution
           '--disable-notifications', // Mimic real user behavior
-          '--enable-accelerated-video-decode',
-          '--enable-accelerated-video-encode', 
-          '--enable-features=UseSurfaceLayerForVideoCapture',
-          '--enable-gpu-rasterization', 
-          '--enable-oop-rasterization',
-          '--disable-gpu-vsync',
-          '--enable-audio-output', // Ensure audio output is enabled
+          '--disable-background-networking',
+          '--disable-background-timer-throttling',
+          '--disable-background-media-suspend',
+          '--disable-backgrounding-occluded-windows',
         ],
         ignoreDefaultArgs: [
           '--enable-automation',
