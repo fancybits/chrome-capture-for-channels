@@ -6,7 +6,6 @@ const process = require('process')
 const path = require('path')
 const express = require('express')
 const morgan = require('morgan')
-require('express-async-errors')
 require('console-stamp')(console, {
   format: ':date(yyyy/mm/dd HH:MM:ss.l)',
 })
@@ -320,7 +319,7 @@ async function main() {
     res.send('true')
   })
 
-  app.get('/stream/:name?', async (req, res) => {
+  app.get('/stream/{:name}', async (req, res) => {
     var u = req.query.url
 
     let name = req.params.name
@@ -569,6 +568,28 @@ async function main() {
 
       } catch (e) {
         console.error('Error for peacocktv.com:', e);
+      }
+    }
+
+    else if (u.includes("watch.spectrum.net")) {
+      console.log("URL contains watch.spectrum.net");
+      try {
+        // Trigger fullscreen mode using the Fullscreen API
+        await delay(1030);
+        await page.evaluate(() => {
+          const element = document.documentElement;
+          if (element.requestFullscreen) {
+            element.requestFullscreen();
+          } else if (element.mozRequestFullScreen) {
+            element.mozRequestFullScreen();
+          } else if (element.webkitRequestFullscreen) {
+            element.webkitRequestFullscreen();
+          } else if (element.msRequestFullscreen) {
+            element.msRequestFullscreen();
+          }
+        });
+      } catch (e) {
+        console.log('Error for watch.spectrum.com:', e);
       }
     }
 

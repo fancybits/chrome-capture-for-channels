@@ -16,7 +16,7 @@ An http server is listening on port 5589 and responds to these routes. the respo
 - `/stream/<name>` for stream names registered in the code
 - `/stream?url=<url>` for other arbitrary URLs
 
-URL support includes nbc.com, slingTV, peacocktv.com [(how to do peacock links)](https://community.getchannels.com/t/adbtuner-a-channel-tuning-application-for-networked-google-tv-android-tv-devices/36822/1895), Google Photo album slideshow, and early testing support for Directv.  [Here](https://github.com/dravenst/chrome-capture-for-channels/blob/main/sample-m3u-sling-channel-definitions.txt) are some more samples for your Channels M3U file (HLS) setup.
+URL support includes nbc.com, slingTV, peacocktv.com [(how to do peacock links)](https://community.getchannels.com/t/adbtuner-a-channel-tuning-application-for-networked-google-tv-android-tv-devices/36822/1895), Google Photo album slideshow, Spectrum, and early testing support for Directv.  [Here](https://github.com/dravenst/chrome-capture-for-channels/blob/main/sample-m3u-sling-channel-definitions.txt) are some more samples for your Channels M3U file (HLS) setup.
 
 Setup a new Custom Channel using:
 

@@ -1,15 +1,14 @@
 {
   "name": "chrome-capture-for-channels",
-  "version": "1.0.0",
+  "version": "1.4.0",
   "bin": "main.js",
   "dependencies": {
     "console-stamp": "^3.1.1",
-    "express": "^4.21.2",
-    "express-async-errors": "^3.1.1",
+    "express": "^5.1.0",
     "morgan": "^1.10.0",
     "puppeteer": "^24.6.1",
     "puppeteer-core": "^24.6.1",
-    "puppeteer-stream": "^3.0.4"
+    "puppeteer-stream": "^3.0.20"
   },
   "devDependencies": {
     "pkg": "^5.8.1"
