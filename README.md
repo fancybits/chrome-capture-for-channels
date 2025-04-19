@@ -16,7 +16,7 @@ An http server is listening on port 5589 and responds to these routes. the respo
 - `/stream/<name>` for stream names registered in the code
 - `/stream?url=<url>` for other arbitrary URLs
 
-URL support includes www.nbc.com, slingTV, Google Photo album slideshow, and early testing support for directv
+URL support includes nbc.com, slingTV, peacocktv.com [(how to do peacock links)](https://community.getchannels.com/t/adbtuner-a-channel-tuning-application-for-networked-google-tv-android-tv-devices/36822/1895), Google Photo album slideshow, and early testing support for Directv.  [Here](https://github.com/dravenst/chrome-capture-for-channels/blob/main/sample-m3u-sling-channel-definitions.txt) are some more samples for your Channels M3U file (HLS) setup.
 
 Setup a new Custom Channel using:
 
@@ -31,11 +31,14 @@ chrome://x.x.x.x:5589/stream/bravo
 #EXTINF:-1 channel-id="CC" channel-number="107" tvc-guide-stationid="62420", Comedy Central
 chrome://x.x.x.x:5589/stream?url=https://watch.sling.com/1/channel/29938328f60d447299ec48511a09ebab/watch
 
+#EXTINF:-1 channel-id="golf" channel-number="401" tvc-guide-stationid="61854", GOLFHD
+chrome://x.x.x.x:5589/stream?url=https://watch.sling.com/1/channel/e7c98734f996492187bb868ce5655a0e/watch
+
+#EXTINF:-1 channel-id="Hallmark",Hallmark
+chrome://x.x.x.x:5589/stream/?url=https://www.peacocktv.com/deeplink?deeplinkData=%7B%22serviceKey%22%3A%224846937553519166117%22%2C%22type%22%3A%22LINEAR_CHANNEL%22%2C%22action%22%3A%22PLAY%22%7D
+
 #EXTINF:-1 channel-id=Google Album",Google Album
 chrome://x.x.x.x:5589/stream?url=https://photos.app.goo.gl/(rest of link from a shared album here)
-
-#EXTINF:-1 channel-id="golf" channel-number="401" tvc-guide-stationid="61854", GOLFHD
-chrome://192.168.50.109:5589/stream?url=https://watch.sling.com/1/channel/e7c98734f996492187bb868ce5655a0e/watch
 
 #EXTINF:-1 channel-id="ESPN",ESPN
 chrome://x.x.x.x:5589/stream?url=http://stream.directv.com/guide/&ch=1234

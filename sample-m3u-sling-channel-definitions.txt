@@ -111,4 +111,5 @@ chrome://localhost:5589/stream?url=https://watch.sling.com/1/channel/e7c98734f99
 #EXTINF:-1 channel-id="bein" tvc-guide-stationid="76950", BEIN1HD
 chrome://localhost:5589/stream?url=https://watch.sling.com/1/channel/9125fbd1c6cd4c93b01387201878f063/watch
 
-
+#EXTINF:-1 channel-id="Hallmark",Hallmark
+chrome://localhost:5589/stream/?url=https://www.peacocktv.com/deeplink?deeplinkData=%7B%22serviceKey%22%3A%224846937553519166117%22%2C%22type%22%3A%22LINEAR_CHANNEL%22%2C%22action%22%3A%22PLAY%22%7D

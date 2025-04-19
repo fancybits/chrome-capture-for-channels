@@ -156,6 +156,7 @@ const getCurrentBrowser = async () => {
           '--disable-component-update',
           '--disable-component-extensions-with-background-pages',
           '--enable-blink-features=IdleDetection',
+          '--mute-audio',
         ],
       }
     )
@@ -552,8 +553,22 @@ async function main() {
         console.log("Set Sling to Full Screen and Volume to max");
         
       } catch (e) {
-        // Handle any errors specific to watch.spectrum.com...
         console.log('Error for watch.sling.com:', e);
+      }
+    }
+
+    else if (u.includes("peacocktv.com")) {
+      console.log("URL contains peacocktv.com");
+      try {
+        // look for the mute button no the first screen
+        await page.waitForSelector('[data-testid="playback-volume-muted-icon"]', { visible: true });
+        await delay(200);
+        await page.keyboard.press('m'); // Press 'm' to unmute
+
+        console.log("Set Peacock to Full Screen and Volume to max");
+
+      } catch (e) {
+        console.error('Error for peacocktv.com:', e);
       }
     }
 
@@ -576,7 +591,6 @@ async function main() {
         console.log("Started Google Slideshow");
         
       } catch (e) {
-        // Handle any errors specific to photos.google.com...
         console.log('Error for photos.google.com:', e);
       }
     }
