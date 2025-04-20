@@ -3,3 +3,4 @@
 /dist
 *.ps1
 settings.json
+package-lock.json

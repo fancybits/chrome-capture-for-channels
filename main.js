@@ -319,10 +319,18 @@ async function main() {
     res.send('true')
   })
 
-  app.get('/stream/{:name}', async (req, res) => {
-    var u = req.query.url
+  // Route requests without special nbc shortcut (e.g. sling, peacock, etc.)
+  app.get('/stream', async (req, res) => {
+    var u = req.query.url;
+    
+    await handleStreamRequest(req, res, u);
+  });
+  
+  // Route requests with special nbc shortcut 
+  app.get('/stream/:name', async (req, res) => {
+    let name = req.params.name;
+    var u = req.query.url;
 
-    let name = req.params.name
     if (name) {
       u = {
         nbc: 'https://www.nbc.com/live?brand=nbc&callsign=nbc',
@@ -355,6 +363,10 @@ async function main() {
       }[name]
     }
 
+    await handleStreamRequest(req, res, u);
+  });
+
+  async function handleStreamRequest(req, res, u) {
     // Minimizing on Windows might cause more lag?  So only do it on Mac?
     var minimizeWindow = false
     if (process.platform == 'darwin' && u.includes("www.nbc.com")) minimizeWindow = true;
@@ -655,7 +667,7 @@ async function main() {
         console.log('Error for stream.directv.com:', e);
       }
     } 
-  })
+  }
 
   const server = app.listen(argv.port, () => {
     console.log('Chrome Capture server listening on port', argv.port);
