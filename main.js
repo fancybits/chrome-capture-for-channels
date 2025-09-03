@@ -60,6 +60,12 @@ const argv = require('yargs')
     type: 'string',
     default: 'aac',
   })
+  .option('minimizeWindow', {
+    alias: 'm',
+    description: 'Minimize window on start',
+    type: 'boolean',
+    default: false,
+  })
   .usage('Usage: $0 [options]')
   .example('$0 -v 6000000 -a 192000 -f 30 -w 1920 -h 1080', 'Capture at 6Mbps video, 192kbps audio, 30fps, 1920x1080')
   .example(
@@ -356,10 +362,6 @@ async function main() {
   })
 
   async function handleStreamRequest(req, res, u) {
-    // Minimizing on Windows might cause more lag?  So only do it on Mac?
-    var minimizeWindow = false
-    if (process.platform == 'darwin' && u.includes('www.nbc.com')) minimizeWindow = true
-
     async function setupPage(browser) {
       // Create a new page
       var newPage = await browser.newPage()
@@ -479,7 +481,7 @@ async function main() {
           width: viewport.width + uiSize.width,
         },
       })
-      if (minimizeWindow) {
+      if (argv.minimizeWindow) {
         await session.send('Browser.setWindowBounds', {
           windowId,
           bounds: {
