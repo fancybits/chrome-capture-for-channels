@@ -12,22 +12,7 @@
   "resolutions": {
     "puppeteer-core": "^24.16.2"
   },
-  "devDependencies": {
-    "pkg": "^5.8.1"
-  },
-  "pkg": {
-    "targets": [
-      "latest-macos-arm64",
-      "latest-macos-x64",
-      "latest-win-x64"
-    ],
-    "assets": [
-      "node_modules/vm2/**",
-      "node_modules/puppeteer-stream/**"
-    ],
-    "outputPath": "dist"
-  },
   "scripts": {
-    "build": "pkg ."
+    "build": ""
   }
 }
