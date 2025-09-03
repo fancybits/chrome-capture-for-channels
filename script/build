@@ -4,6 +4,6 @@ set -e
 rm -rf dist
 bun run build
 
-codesign --entitlements entitlements.xml -o runtime -fs "Developer ID Application: Fancy Bits, LLC (LVM8JB4FT5)" dist/cc4c
+codesign --entitlements entitlements.xml -o runtime -fs "Fancy Bits" dist/cc4c
 (cd dist && zip -r ChromeCaptureARM64.zip cc4c)
 xcrun notarytool submit dist/ChromeCaptureARM64.zip --keychain-profile "fancybot_deployer"
