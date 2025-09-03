@@ -1,16 +1,9 @@
 #!/bin/sh
 set -e
 
-rm dist/chrome-capture-for-channels-*
-npm run build
+rm -rf dist
+bun run build
 
-codesign --entitlements entitlements.xml -o runtime -fs "Developer ID Application: Fancy Bits, LLC (LVM8JB4FT5)" dist/chrome-capture-for-channels-macos-arm64
-rm -f dist/ChromeCaptureARM64.zip
-(cd dist && zip -r ChromeCaptureARM64.zip chrome-capture-for-channels-macos-arm64)
-
-codesign --entitlements entitlements.xml -o runtime -fs "Developer ID Application: Fancy Bits, LLC (LVM8JB4FT5)" dist/chrome-capture-for-channels-macos-x64
-rm -f dist/ChromeCaptureIntel.zip
-(cd dist && zip -r ChromeCaptureIntel.zip chrome-capture-for-channels-macos-x64)
-
+codesign --entitlements entitlements.xml -o runtime -fs "Developer ID Application: Fancy Bits, LLC (LVM8JB4FT5)" dist/cc4c
+(cd dist && zip -r ChromeCaptureARM64.zip cc4c)
 xcrun notarytool submit dist/ChromeCaptureARM64.zip --keychain-profile "fancybot_deployer"
-xcrun notarytool submit dist/ChromeCaptureIntel.zip --keychain-profile "fancybot_deployer"

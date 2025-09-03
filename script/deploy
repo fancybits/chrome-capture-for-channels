@@ -7,4 +7,4 @@ script/build
 git tag $tag
 git push --tags
 gh release create $tag --generate-notes
-gh release upload $tag dist/ChromeCapture*.zip dist/chrome-capture-for-channels-win-x64.exe
+gh release upload $tag dist/ChromeCapture*.zip dist/cc4c.exe

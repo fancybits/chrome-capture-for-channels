@@ -1,6 +1,6 @@
 {
   "name": "chrome-capture-for-channels",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "bin": "main.js",
   "dependencies": {
     "console-stamp": "^3.1.1",
@@ -13,6 +13,8 @@
     "puppeteer-core": "^24.16.2"
   },
   "scripts": {
-    "build": ""
+    "build": "bun run build-mac && bun run build-win",
+    "build-mac": "bun build main.js --compile --outfile dist/cc4c --target=bun-darwin-arm64",
+    "build-win": "bun build main.js --compile --outfile dist/cc4c.exe --target=bun-windows-x64"
   }
 }
