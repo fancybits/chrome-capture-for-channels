@@ -65,9 +65,6 @@ const getCurrentBrowser = async () => {
     currentBrowser.on('close', () => {
       currentBrowser = null
     })
-    currentBrowser.pages().then(pages => {
-      pages.forEach(page => page.close())
-    })
   }
   return currentBrowser
 }
