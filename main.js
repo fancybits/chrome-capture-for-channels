@@ -97,9 +97,6 @@ const getCurrentBrowser = async () => {
     currentBrowser = await launch(
       {
         launch: opts => {
-          if (process.pkg) {
-            opts.enableExtensions.push(path.join(dataDir, 'extension'))
-          }
           if (process.env.DOCKER || process.platform == 'win32') {
             opts.args = opts.args.concat(['--no-sandbox'])
           }
