@@ -48,18 +48,6 @@ const argv = require('yargs')
     type: 'number',
     default: 1080,
   })
-  .option('videoCodec', {
-    alias: 'i',
-    description: 'Video codec (e.g., h264_nvenc, h264_qsv, h264_amf, h264_vaapi)',
-    type: 'string',
-    default: 'h264_nvenc',
-  })
-  .option('audioCodec', {
-    alias: 'u',
-    description: 'Audio codec (e.g., aac, opus)',
-    type: 'string',
-    default: 'aac',
-  })
   .option('minimizeWindow', {
     alias: 'm',
     description: 'Minimize window on start',
@@ -85,14 +73,10 @@ console.log(`Audio Bitrate: ${argv.audioBitrate} bps (${argv.audioBitrate / 1000
 console.log(`Minimum Frame Rate: ${argv.frameRate} fps`)
 console.log(`Port: ${argv.port}`)
 console.log(`Resolution: ${argv.width}x${argv.height}`)
-console.log(`Video Codec: ${argv.videoCodec}`)
-console.log(`Audio Codec: ${argv.audioCodec}`)
 
 const encodingParams = {
   videoBitsPerSecond: argv.videoBitrate,
   audioBitsPerSecond: argv.audioBitrate,
-  videoCodec: argv.videoCodec, // Use NVENC for video encoding
-  audioCodec: argv.audioCodec, // Use AAC for audio encoding
   minFrameRate: argv.frameRate,
   maxFrameRate: 60,
   mimeType: 'video/webm;codecs=H264',
@@ -404,8 +388,6 @@ async function main() {
 
     try {
       const stream = await getStream(page, {
-        videoCodec: encodingParams.videoCodec,
-        audioCodec: encodingParams.audioCodec,
         video: true,
         audio: true,
         videoBitsPerSecond: encodingParams.videoBitsPerSecond,
