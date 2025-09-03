@@ -35,21 +35,22 @@ to setup a development environment where you can edit and run `main.js`:
 
 ```
 winget install -e --id Git.Git
-winget install -e --id OpenJS.NodeJS
+winget install -e --id Oven-sh.Bun
 
 git clone https://github.com/fancybits/chrome-capture-for-channels
 cd chrome-capture-for-channels
-npm install
-node main.js
+bun install
+bun main.js
 ```
 
 #### mac
 
 ```
-brew install nodejs git
+brew install git
+brew install oven-sh/bun/bun
 
 git clone https://github.com/fancybits/chrome-capture-for-channels
 cd chrome-capture-for-channels
-npm install
-node main.js
+bun install
+bun main.js
 ```
