@@ -10,9 +10,94 @@ require('console-stamp')(console, {
   format: ':date(yyyy/mm/dd HH:MM:ss.l)',
 })
 
+// Parse command line arguments
+const argv = require('yargs')
+  .option('videoBitrate', {
+    alias: 'v',
+    description: 'Video bitrate in bits per second',
+    type: 'number',
+    default: 6000000,
+  })
+  .option('audioBitrate', {
+    alias: 'a',
+    description: 'Audio bitrate in bits per second',
+    type: 'number',
+    default: 256000,
+  })
+  .option('frameRate', {
+    alias: 'f',
+    description: 'Minimum frame rate',
+    type: 'number',
+    default: 30,
+  })
+  .option('port', {
+    alias: 'p',
+    description: 'Port number for the server',
+    type: 'number',
+    default: 5589,
+  })
+  .option('width', {
+    alias: 'w',
+    description: 'Video width in pixels (e.g., 1920 for 1080p)',
+    type: 'number',
+    default: 1920,
+  })
+  .option('height', {
+    alias: 'h',
+    description: 'Video height in pixels (e.g., 1080 for 1080p)',
+    type: 'number',
+    default: 1080,
+  })
+  .option('videoCodec', {
+    alias: 'i',
+    description: 'Video codec (e.g., h264_nvenc, h264_qsv, h264_amf, h264_vaapi)',
+    type: 'string',
+    default: 'h264_nvenc',
+  })
+  .option('audioCodec', {
+    alias: 'u',
+    description: 'Audio codec (e.g., aac, opus)',
+    type: 'string',
+    default: 'aac',
+  })
+  .usage('Usage: $0 [options]')
+  .example('$0 -v 6000000 -a 192000 -f 30 -w 1920 -h 1080', 'Capture at 6Mbps video, 192kbps audio, 30fps, 1920x1080')
+  .example(
+    '$0 --videoBitrate 8000000 --audioBitrate 320000 --frameRate 60 --width 1920 --height 1080',
+    'High quality capture at 8Mbps and 60fpsm 1920x1080'
+  )
+  .wrap(null) // Don't wrap help text
+  .help()
+  .alias('help', '?')
+  .version(false).argv // Disable version number in help
+
+// Display settings
+console.log('Selected settings:')
+console.log(`Video Bitrate: ${argv.videoBitrate} bps (${argv.videoBitrate / 1000000}Mbps)`)
+console.log(`Audio Bitrate: ${argv.audioBitrate} bps (${argv.audioBitrate / 1000}kbps)`)
+console.log(`Minimum Frame Rate: ${argv.frameRate} fps`)
+console.log(`Port: ${argv.port}`)
+console.log(`Resolution: ${argv.width}x${argv.height}`)
+console.log(`Video Codec: ${argv.videoCodec}`)
+console.log(`Audio Codec: ${argv.audioCodec}`)
+
+const encodingParams = {
+  videoBitsPerSecond: argv.videoBitrate,
+  audioBitsPerSecond: argv.audioBitrate,
+  videoCodec: argv.videoCodec, // Use NVENC for video encoding
+  audioCodec: argv.audioCodec, // Use AAC for audio encoding
+  minFrameRate: argv.frameRate,
+  maxFrameRate: 60,
+  mimeType: 'video/webm;codecs=H264',
+}
+
 const viewport = {
-  width: 1920,
-  height: 1080,
+  width: argv.width,
+  height: argv.height,
+}
+
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 var currentBrowser, dataDir, lastPage
@@ -34,22 +119,33 @@ const getCurrentBrowser = async () => {
               '--enable-features=VaapiVideoDecoder,VaapiVideoEncoder',
               '--ignore-gpu-blocklist',
               '--enable-zero-copy',
-              '--enable-drdc'
+              '--enable-drdc',
+              '--no-sandbox',
             ])
           }
+          console.log('Launching Browser, Opts', opts)
           return puppeteerLaunch(opts)
         },
       },
       {
         executablePath: getExecutablePath(),
+        pipe: true, // more robust to keep browser connection from disconnecting
+        headless: false,
         defaultViewport: null, // no viewport emulation
         userDataDir: path.join(dataDir, 'chromedata'),
         args: [
-          '--no-first-run',
-          '--disable-infobars',
+          '--no-first-run', // Skip first run wizards
           '--hide-crash-restore-bubble',
-          '--disable-blink-features=AutomationControlled',
-          '--hide-scrollbars',
+          '--allow-running-insecure-content', // Sling has both https and http
+          '--autoplay-policy=no-user-gesture-required',
+          '--disable-blink-features=AutomationControlled', // mitigates bot detection
+          '--hide-scrollbars', // Hide scrollbars on captured pages
+          '--window-size=' + viewport.width + ',' + viewport.height, // Set viewport resolution
+          '--disable-notifications', // Mimic real user behavior
+          '--disable-background-networking',
+          '--disable-background-timer-throttling',
+          '--disable-background-media-suspend',
+          '--disable-backgrounding-occluded-windows',
         ],
         ignoreDefaultArgs: [
           '--enable-automation',
@@ -58,13 +154,33 @@ const getCurrentBrowser = async () => {
           '--disable-component-update',
           '--disable-component-extensions-with-background-pages',
           '--enable-blink-features=IdleDetection',
+          '--mute-audio',
         ],
       }
     )
+
     currentBrowser.on('close', () => {
       currentBrowser = null
+      console.log('Browser closed')
+    })
+
+    currentBrowser.on('targetcreated', target => {
+      console.log('New target page created:', target.url())
+    })
+
+    currentBrowser.on('targetchanged', target => {
+      console.log('Target page changed:', target.url())
+    })
+
+    currentBrowser.on('targetdestroyed', target => {
+      console.log('Browser page closed:', target.url())
+    })
+
+    currentBrowser.on('disconnected', () => {
+      console.log('Browser disconnected')
     })
   }
+
   return currentBrowser
 }
 
@@ -236,22 +352,47 @@ async function main() {
       }[name]
     }
 
-    var waitForVideo = req.query.waitForVideo === 'false' ? false : true
-    switch (name) {
-      case 'weatherscan':
-      case 'windy':
-      case 'gpu':
-        waitForVideo = false
-    }
+    await handleStreamRequest(req, res, u)
+  })
+
+  async function handleStreamRequest(req, res, u) {
+    // Minimizing on Windows might cause more lag?  So only do it on Mac?
     var minimizeWindow = false
-    if (process.platform == 'darwin' && waitForVideo) minimizeWindow = true
+    if (process.platform == 'darwin' && u.includes('www.nbc.com')) minimizeWindow = true
+
+    async function setupPage(browser) {
+      // Create a new page
+      var newPage = await browser.newPage()
+
+      // Stabilize it
+      await newPage.setBypassCSP(true) // Sometimes needed for puppeteer-stream
+      await delay(1000) // Wait for the page to be stable
+
+      // Now try to enable stream capabilities
+      if (newPage.getStream) {
+        console.log('Stream capabilities already present')
+      } else {
+        console.log('Need to initialize stream capabilities')
+        // Here you might need to reinitialize puppeteer-stream
+      }
+
+      // Show browser error messages, but for Sling filter out Sling Mixed Content warnings
+      newPage.on('console', msg => {
+        const text = msg.text()
+        // Filter out messages containing "Mixed Content"
+        if (!text.includes('Mixed Content')) {
+          // UNCOMMENT THIS LINE TO SEE ALL BROWSER MESSAGES
+          //console.log(text);
+        }
+      })
+
+      return newPage
+    }
 
     var browser, page
     try {
       browser = await getCurrentBrowser()
-      page = await browser.newPage()
-      //await page.setBypassCSP(true)
-      //page.on('console', msg => console.log(msg.text()))
+      page = await setupPage(browser)
     } catch (e) {
       console.log('failed to start browser page', u, e)
       res.status(500).send(`failed to start browser page: ${e}`)
@@ -260,28 +401,55 @@ async function main() {
 
     try {
       const stream = await getStream(page, {
+        videoCodec: encodingParams.videoCodec,
+        audioCodec: encodingParams.audioCodec,
         video: true,
         audio: true,
-        videoBitsPerSecond: 8000000,
-        audioBitsPerSecond: 192000,
-        mimeType: 'video/webm;codecs=H264',
+        videoBitsPerSecond: encodingParams.videoBitsPerSecond,
+        audioBitsPerSecond: encodingParams.audioBitsPerSecond,
+        mimeType: encodingParams.mimeType,
         videoConstraints: {
           mandatory: {
             minWidth: viewport.width,
             minHeight: viewport.height,
             maxWidth: viewport.width,
             maxHeight: viewport.height,
-            minFrameRate: 60,
+            minFrameRate: encodingParams.minFrameRate,
+            maxFrameRate: encodingParams.maxFrameRate,
           },
         },
       })
 
+      // Handle stream events
+      stream.on('error', err => {
+        console.log('Stream error:', err)
+      })
+
+      stream.on('end', () => {
+        console.log('Stream ended naturally')
+      })
+
       console.log('streaming', u)
       stream.pipe(res)
+
+      // Handle response events - close event is expected
       req.on('close', async err => {
-        await stream.destroy()
+        console.log('received close event on request')
+        stream.destroy()
         await page.close()
         console.log('finished', u)
+      })
+
+      res.on('error', async err => {
+        console.log('error on response:', err)
+        stream.destroy()
+        await page.close()
+      })
+
+      res.on('finish', async err => {
+        console.log('Response finished')
+        stream.destroy()
+        await page.close()
       })
     } catch (e) {
       console.log('failed to start stream', u, e)
@@ -291,8 +459,42 @@ async function main() {
     }
 
     try {
+      // go to the page
       await page.goto(u)
-      if (waitForVideo) {
+
+      //  get some additional info about the page
+      const uiSize = await page.evaluate(`(function() {
+        return {
+          height: window.outerHeight - window.innerHeight,
+          width: window.outerWidth - window.innerWidth,
+        }
+      })()`)
+      const session = await page.target().createCDPSession()
+      const {windowId} = await session.send('Browser.getWindowForTarget')
+
+      await session.send('Browser.setWindowBounds', {
+        windowId,
+        bounds: {
+          height: viewport.height + uiSize.height,
+          width: viewport.width + uiSize.width,
+        },
+      })
+      if (minimizeWindow) {
+        await session.send('Browser.setWindowBounds', {
+          windowId,
+          bounds: {
+            windowState: 'minimized',
+          },
+        })
+      }
+    } catch (e) {
+      console.log('failed to goto page and setup window', u, e)
+    }
+
+    // For NBC, look for video element and wait for it to be ready
+    if (u.includes('www.nbc.com')) {
+      console.log('URL contains www.nbc.com')
+      try {
         await page.waitForSelector('video')
         await page.waitForFunction(`(function() {
           let video = document.querySelector('video')
@@ -319,39 +521,136 @@ async function main() {
             header.style.zIndex = '0'
           }
         })()`)
+      } catch (e) {
+        console.log('failed to start stream', u, e)
       }
-
-      const uiSize = await page.evaluate(`(function() {
-        return {
-          height: window.outerHeight - window.innerHeight,
-          width: window.outerWidth - window.innerWidth,
-        }
-      })()`)
-      const session = await page.target().createCDPSession()
-      const {windowId} = await session.send('Browser.getWindowForTarget')
-      await session.send('Browser.setWindowBounds', {
-        windowId,
-        bounds: {
-          height: viewport.height + uiSize.height,
-          width: viewport.width + uiSize.width,
-        },
-      })
-      if (minimizeWindow) {
-        await session.send('Browser.setWindowBounds', {
-          windowId,
-          bounds: {
-            windowState: 'minimized',
-          },
-        })
-      }
-    } catch (e) {
-      console.log('failed to stream', u, e)
     }
-  })
 
-  const server = app.listen(5589, () => {
-    console.log('Chrome Capture server listening on port 5589')
+    // Handle Sling TV
+    else if (u.includes('watch.sling.com')) {
+      console.log('URL contains watch.sling.com')
+      try {
+        // Div tag names can be found in the Chrome DevTools Layout tab
+
+        // Click the full screen button
+        const fullScreenButton = await page.waitForSelector('div.player-button.active.videoPlayerFullScreenToggle')
+        await fullScreenButton.click() //click for fullscreen
+
+        // Find Mute button and then use volume slider
+        const muteButton = await page.waitForSelector('div.player-button.active.volumeControls')
+        await muteButton.click() //click unmute
+
+        // Simulate pressing the right arrow key 10 times to max volume
+        for (let i = 0; i < 10; i++) {
+          await delay(200)
+          await page.keyboard.press('ArrowRight')
+        }
+
+        console.log('Set Sling to Full Screen and Volume to max')
+      } catch (e) {
+        console.log('Error for watch.sling.com:', e)
+      }
+    } else if (u.includes('peacocktv.com')) {
+      console.log('URL contains peacocktv.com')
+      try {
+        // look for the mute button no the first screen
+        await page.waitForSelector('[data-testid="playback-volume-muted-icon"]', {visible: true})
+        await delay(200)
+        await page.keyboard.press('m') // Press 'm' to unmute
+
+        console.log('Set Peacock to Full Screen and Volume to max')
+      } catch (e) {
+        console.error('Error for peacocktv.com:', e)
+      }
+    } else if (u.includes('watch.spectrum.net')) {
+      console.log('URL contains watch.spectrum.net')
+      try {
+        // Trigger fullscreen mode using the Fullscreen API
+        await delay(1030)
+        await page.evaluate(() => {
+          const element = document.documentElement
+          if (element.requestFullscreen) {
+            element.requestFullscreen()
+          } else if (element.mozRequestFullScreen) {
+            element.mozRequestFullScreen()
+          } else if (element.webkitRequestFullscreen) {
+            element.webkitRequestFullscreen()
+          } else if (element.msRequestFullscreen) {
+            element.msRequestFullscreen()
+          }
+        })
+      } catch (e) {
+        console.log('Error for watch.spectrum.com:', e)
+      }
+    }
+
+    // Handle Google Photos
+    else if (u.includes('photos.app.goo.gl')) {
+      console.log('URL contains photos.app.goo.gl')
+      try {
+        // Simulate pressing the tab key key 10 times to get to the More Options button
+        for (let i = 0; i < 8; i++) {
+          await delay(200)
+          await page.keyboard.press('Tab')
+        }
+
+        // Press Enter twice to start Slideshow
+        await page.keyboard.press('Enter')
+        await delay(200)
+        await page.keyboard.press('Enter')
+
+        console.log('Started Google Slideshow')
+      } catch (e) {
+        console.log('Error for photos.google.com:', e)
+      }
+    }
+
+    // Handle DirecTV Stream
+    else if (u.includes('stream.directv.com')) {
+      console.log('URL contains stream.directv.com')
+      try {
+        // Extract the channel name from the "ch" query parameter of the URL
+        // e.g. http://localhost:5589/stream?url=http://stream.directv.com/guide&ch=1234
+        const channel = req.query.ch
+
+        // Simulate pressing the Tab key 6 times
+        for (let i = 0; i < 6; i++) {
+          await delay(500)
+          await page.keyboard.press('Tab')
+        }
+        console.log('Searching DirecTVStream Channel List for: ', channel)
+        await page.keyboard.type(channel) // Use the variable without quotes
+        await delay(1115)
+        await page.mouse.click(755, 150, {button: 'left'}) // Second click (left-click) - Only line added
+        console.log('Waiting for channel load: ' + channel)
+        await delay(10000)
+        console.log('Channel loaded, going Full Screen: ' + channel)
+
+        // Trigger fullscreen mode using the Fullscreen API
+        await page.evaluate(() => {
+          const element = document.documentElement
+          if (element.requestFullscreen) {
+            element.requestFullscreen()
+          } else if (element.mozRequestFullScreen) {
+            element.mozRequestFullScreen()
+          } else if (element.webkitRequestFullscreen) {
+            element.webkitRequestFullscreen()
+          } else if (element.msRequestFullscreen) {
+            element.msRequestFullscreen()
+          }
+        })
+      } catch (e) {
+        console.log('Error for stream.directv.com:', e)
+      }
+    }
+  }
+
+  const server = app.listen(argv.port, () => {
+    console.log('Chrome Capture server listening on port', argv.port)
   })
 }
 
-main()
+main().catch(err => {
+  console.error(err)
+  process.exit(1)
+})
