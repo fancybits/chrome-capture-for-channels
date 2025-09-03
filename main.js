@@ -213,23 +213,13 @@ const getExecutablePath = () => {
 
 async function main() {
   dataDir = process.cwd()
-  if (process.pkg) {
-    switch (process.platform) {
-      case 'darwin':
-        dataDir = path.join(process.env.HOME, 'Library', 'Application Support', 'ChromeCapture')
-        break
-      case 'win32':
-        dataDir = path.join(process.env.USERPROFILE, 'AppData', 'Local', 'ChromeCapture')
-        break
-    }
-    let out = path.join(dataDir, 'extension')
-    fs.mkdirSync(out, {recursive: true})
-    ;['manifest.json', 'background.js', 'options.html', 'options.js'].forEach(file => {
-      fs.copyFileSync(
-        path.join(process.pkg.entrypoint, '..', 'node_modules', 'puppeteer-stream', 'extension', file),
-        path.join(out, file)
-      )
-    })
+  switch (process.platform) {
+    case 'darwin':
+      dataDir = path.join(process.env.HOME, 'Library', 'Application Support', 'ChromeCapture')
+      break
+    case 'win32':
+      dataDir = path.join(process.env.USERPROFILE, 'AppData', 'Local', 'ChromeCapture')
+      break
   }
 
   const app = express()
