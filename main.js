@@ -23,13 +23,7 @@ const getCurrentBrowser = async () => {
       {
         launch: opts => {
           if (process.pkg) {
-            opts.args = opts.args.filter(
-              arg => !arg.startsWith('--load-extension=') && !arg.startsWith('--disable-extensions-except=')
-            )
-            opts.args = opts.args.concat([
-              `--load-extension=${path.join(dataDir, 'extension')}`,
-              `--disable-extensions-except=${path.join(dataDir, 'extension')}`,
-            ])
+            opts.enableExtensions.push(path.join(dataDir, 'extension'))
           }
           if (process.env.DOCKER || process.platform == 'win32') {
             opts.args = opts.args.concat(['--no-sandbox'])
@@ -240,7 +234,7 @@ async function main() {
         nbcschicago: 'https://www.nbc.com/live?brand=rsn-chicago&callsign=nbcschicago',
         nbcsphiladelphia: 'https://www.nbc.com/live?brand=rsn-philadelphia&callsign=nbcsphiladelphia',
         nbcswashington: 'https://www.nbc.com/live?brand=rsn-washington&callsign=nbcswashington',
-        weatherscan: 'https://weatherscan.net/',
+        weatherscan: 'https://v2.weatherscan.net/',
         windy: 'https://windy.com',
         gpu: 'chrome://gpu',
       }[name]
