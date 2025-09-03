@@ -278,7 +278,7 @@ async function main() {
 
       console.log('streaming', u)
       stream.pipe(res)
-      res.on('close', async err => {
+      req.on('close', async err => {
         await stream.destroy()
         await page.close()
         console.log('finished', u)
