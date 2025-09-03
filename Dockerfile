@@ -13,12 +13,13 @@ RUN apt-get update \
     && apt-get install -y google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 --no-install-recommends
 
 WORKDIR /home/chrome
-COPY main.js package.json yarn.lock /home/chrome/
+COPY main.js package.json bun.lock /home/chrome/
 
 FROM base
-RUN npm install
+RUN npm install -g bun
+RUN bun install
 EXPOSE 5589
 ENV DISPLAY :99
 ENV CHROME_BIN /usr/bin/google-chrome
 ENV DOCKER true
-CMD Xvfb :99 -screen 0 1920x1080x16 & node main.js
+CMD Xvfb :99 -screen 0 1920x1080x16 & bun main.js
