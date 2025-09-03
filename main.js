@@ -66,6 +66,7 @@ const argv = require('yargs')
     type: 'boolean',
     default: false,
   })
+  .scriptName('cc4c')
   .usage('Usage: $0 [options]')
   .example('$0 -v 6000000 -a 192000 -f 30 -w 1920 -h 1080', 'Capture at 6Mbps video, 192kbps audio, 30fps, 1920x1080')
   .example(
