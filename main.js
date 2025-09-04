@@ -97,9 +97,6 @@ const getCurrentBrowser = async () => {
     currentBrowser = await launch(
       {
         launch: opts => {
-          if (process.env.DOCKER || process.platform == 'win32') {
-            opts.args = opts.args.concat(['--no-sandbox'])
-          }
           if (process.env.DOCKER) {
             opts.args = opts.args.concat([
               '--use-gl=angle',
