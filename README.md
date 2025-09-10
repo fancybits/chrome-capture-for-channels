@@ -9,7 +9,28 @@ download the latest [release](https://github.com/fancybits/chrome-capture-for-ch
 or run in docker:
 
 ```
-docker run -d --name chrome-capture -p 5589:5589 fancybits/chrome-capture-for-channels
+docker run -d \
+  --name cc4c \
+  --shm-size=1g \
+  -p 5589:5589 \
+  -p 5900:5900 \
+  -e HOST_VNC_PORT=5900 \
+  -e VIDEO_BITRATE=9500000 \
+  -e AUDIO_BITRATE=256000 \
+  -e FRAMERATE=30 \
+  -e CC4C_PORT=5589 \
+  -e VIDEO_WIDTH=1920 \
+  -e VIDEO_HEIGHT=1080 \
+  -e VIDEO_CODEC=h264_vaapi \
+  -e AUDIO_CODEC=aac \
+  -e TZ=US/Mountain \
+  -v cookies:/home/chrome/chromedata/Default/Cookies \
+  -v logins:/home/chrome/chromedata/Default/Login\ Data \
+  -v localstorage:/home/chrome/chromedata/Default/Local\ Storage \
+  -v prefs:/home/chrome/chromedata/Default/Preferences \
+  -v secure:/home/chrome/chromedata/Default/Secure\ Preferences \
+  --restart unless-stopped \
+  fancybits/chrome-capture-for-channels:latest
 ```
 
 ### usage
