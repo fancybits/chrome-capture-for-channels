@@ -1,10 +1,16 @@
 #docker buildx build --platform linux/amd64 -f Dockerfile -t bnhf/cc4c:latest -t bnhf/cc4c:2025.04.12 . --push --no-cache
-FROM node:lts-bullseye-slim AS base
+FROM node:lts-bookworm-slim AS base
 
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Add contrib and non-free sources to apt
-RUN sed -i 's/main$/main contrib non-free/' /etc/apt/sources.list
+# Delete deb822 file and manage everything in sources.list
+RUN rm -f /etc/apt/sources.list.d/debian.sources \
+ && printf '%s\n' \
+  "deb http://deb.debian.org/debian bookworm main contrib non-free non-free-firmware" \
+  "deb http://deb.debian.org/debian-security bookworm-security main contrib non-free non-free-firmware" \
+  "deb http://deb.debian.org/debian bookworm-updates main contrib non-free non-free-firmware" \
+  > /etc/apt/sources.list
 
 # Core system and Chrome runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \

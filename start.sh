@@ -1,5 +1,6 @@
 #!/bin/bash
 # start.sh
+# 2025.09.10
 
 # Usage: bun main.js [options]
 # Options:
@@ -14,13 +15,16 @@
 #   bun main.js -v 6000000 -a 192000 -f 30 -w 1920 -h 1080
 #   bun main.js --videoBitrate 8000000 --frameRate 60 --width 1920 --height 1080
 
-[[ -f /dev/dri/renderD128 ]] && chown 0:107 /dev/dri/renderD128 # Correct group for node:lts-bullseye-slim
+[[ -c /dev/dri/renderD128 ]] && chgrp render /dev/dri/renderD128
+[[ -f /tmp/.X99-lock ]] && rm /tmp/.X99-lock
 
 trap 'echo "Cleaning up..."; pkill -f "Xvfb :99"; pkill -f "x11vnc"; exit' SIGINT SIGTERM EXIT
 
+google-chrome --version
 Xvfb :99 -screen 0 1920x1080x16 &
 x11vnc -quiet -nopw -display :99 -forever >x11vnc.log 2>&1 &
 sleep 1
-awk 'NR > 2' x11vnc.log
+grep "The VNC desktop is:" x11vnc.log
+echo "The VNC port is:         $HOST_VNC_PORT"
 sleep 1
 bun main.js -v $VIDEO_BITRATE -a $AUDIO_BITRATE -f $FRAMERATE -p $CC4C_PORT -w $VIDEO_WIDTH -h $VIDEO_HEIGHT
