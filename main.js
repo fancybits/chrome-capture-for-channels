@@ -10,6 +10,24 @@ require('console-stamp')(console, {
   format: ':date(yyyy/mm/dd HH:MM:ss.l)',
 })
 
+// --- suppress harmless first-run extension error, but still restart ---
+const EXT_ID = 'jjndjgheafjngoipoacpjgeicjeomjli';
+
+process.on('unhandledRejection', (reason) => {
+  const msg = String(reason?.message || reason || '');
+  if (
+    msg.includes('net::ERR_BLOCKED_BY_CLIENT') &&
+    msg.includes(`chrome-extension://${EXT_ID}/options.html`)
+  ) {
+    console.log('[Info] Restarting due to Chrome extension first-run bootstrap');
+    process.exit(1);  // still exit so supervisor restarts
+    return;
+  }
+  console.error('Unhandled rejection:', reason);
+  process.exit(1);
+});
+// ---------------------------------------------------------------------
+
 // Parse command line arguments
 const argv = require('yargs')
   .option('videoBitrate', {
