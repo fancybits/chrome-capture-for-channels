@@ -19,8 +19,6 @@ services:
       - CC4C_PORT=${CC4C_PORT:-5589} # Port number for the server  [number] [default: 5589]
       - VIDEO_WIDTH=${VIDEO_WIDTH:-1920} # Video width in pixels (e.g., 1920 for 1080p)  [number] [default: 1920]
       - VIDEO_HEIGHT=${VIDEO_HEIGHT:-1080} # Video height in pixels (e.g., 1080 for 1080p)  [number] [default: 1080]
-      - VIDEO_CODEC=${VIDEO_CODEC:-h264_nvenc} # Video codec (e.g., h264_nvenc, h264_qsv, h264_amf, h264_vaapi)  [string] [default: "h264_nvenc"]
-      - AUDIO_CODEC=${AUDIO_CODEC:-aac} # Audio codec (e.g., aac, opus)  [string] [default: "aac"]
       - TZ=${TZ} # Your local timezone in Linux "tz" format.
     volumes:
       - cookies:/home/chrome/chromedata/Default/Cookies # Creates a persistent Docker Volume in /var/lib/docker/volumes for Chrome cookie data.

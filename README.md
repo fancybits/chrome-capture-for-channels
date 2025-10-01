@@ -21,8 +21,6 @@ docker run -d \
   -e CC4C_PORT=5589 \
   -e VIDEO_WIDTH=1920 \
   -e VIDEO_HEIGHT=1080 \
-  -e VIDEO_CODEC=h264_vaapi \
-  -e AUDIO_CODEC=aac \
   -e TZ=US/Mountain \
   -v cookies:/home/chrome/chromedata/Default/Cookies \
   -v logins:/home/chrome/chromedata/Default/Login\ Data \
