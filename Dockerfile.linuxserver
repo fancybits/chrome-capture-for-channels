@@ -1,0 +1,26 @@
+#docker buildx build --platform linux/amd64 -f Dockerfile.linuxserver -t bnhf/cc4c:linuxserver . --push --no-cache
+FROM linuxserver/chrome:140.0.7339 AS base
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+# Add the Node 18 repo via script and install nodejs
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get update && apt-get install -y --no-install-recommends nodejs
+
+# Environment setup
+ENV DISPLAY=:99
+ENV CHROME_BIN=/usr/bin/google-chrome
+ENV LIBVA_DRIVER_NAME=iHD
+ENV DOCKER=true
+
+# Create app directory and copy files
+WORKDIR /home/chrome
+COPY main.js package.json bun.lock ./
+
+# Install Node dependencies
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+RUN npm install -g bun
+RUN bun install
+
+# Expose app and VNC ports
+EXPOSE 5589 5900

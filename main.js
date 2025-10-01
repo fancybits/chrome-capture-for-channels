@@ -19,7 +19,7 @@ process.on('unhandledRejection', (reason) => {
     msg.includes('net::ERR_BLOCKED_BY_CLIENT') &&
     msg.includes(`chrome-extension://${EXT_ID}/options.html`)
   ) {
-    console.log('[Info] Restarting due to Chrome extension first-run bootstrap');
+    console.log('[Info] Restarting following first-run puppeteer-stream extension installation');
     process.exit(1);  // still exit so supervisor restarts
     return;
   }
